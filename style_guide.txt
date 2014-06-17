@@ -15,3 +15,4 @@ STYLE:
 ------> }
 - Blocks of code (loops, if-then & switch-case statements, nested classes, etc.)
   should have 1-space separating them from other lines of code around them.
+- No newline at the end of file.
