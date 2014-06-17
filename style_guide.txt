@@ -1,0 +1,17 @@
+FORMATTING:
+- No classes should extend any other class; instead, a class should be created
+  as a single reference variable.
+- Due to the rule above, all classes will be final classes (no need to extend).
+- Use the static & final keywords wherever possible (e.g. all formal method
+  parameters should be final).
+- Use the least amount of memory/size required when using primitives data types.
+
+STYLE:
+- All indentation should be 8-spaces (set the tab width to a size of 8).
+- All curly braces should align vertically.
+        public static void main(final String[] args)
+------> {
+                // do something
+------> }
+- Blocks of code (loops, if-then & switch-case statements, nested classes, etc.)
+  should have 1-space separating them from other lines of code around them.
