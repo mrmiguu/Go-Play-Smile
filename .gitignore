@@ -1,7 +1,11 @@
+# Readme
+README.TXT
+
 # BlueJ
 package.bluej
 *.ctxt
 
+# Java class file
 *.class
 
 # Mobile Tools for Java (J2ME)
