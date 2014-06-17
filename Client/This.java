@@ -1,4 +1,4 @@
-public final class This
+final class This
 {
         /*
          * Constants
@@ -13,6 +13,8 @@ public final class This
          * Mutable fields
          */
         private static boolean unloading;
+        private static byte fps;
+        private static int cps;
         
         /**
          * The main entry point for the client.
@@ -67,7 +69,8 @@ public final class This
                         ++counterCps;
                         if (timerCps < CURRENT_TIME_MILLIS)
                         {
-                                System.out.println("FPS: " + counterFps + " | CPS: " + counterCps);
+                                fps = counterFps;
+                                cps = counterCps;
                                 counterCps = counterFps = 0;
                                 timerCps = CURRENT_TIME_MILLIS + 1000;
                         }
@@ -88,7 +91,7 @@ public final class This
          * 
          * @return the unloading state
          */
-        public static boolean getUnloading()
+        static boolean getUnloading()
         {
                 synchronized (unloadingLock)
                 {
@@ -101,11 +104,31 @@ public final class This
          * 
          * @param state  the unloading state to-be
          */
-        public static void setUnloading(final boolean state)
+        static void setUnloading(final boolean state)
         {
                 synchronized (unloadingLock)
                 {
                         unloading = state;
                 }
+        }
+        
+        /**
+         * Retrieves the client's frame rate on a per second basis.
+         * 
+         * @return amount of frames per second
+         */
+        static byte getFps()
+        {
+                return fps;
+        }
+        
+        /**
+         * Retrieves the client's cycle rate on a per second basis.
+         * 
+         * @return amount of cycle per second
+         */
+        static int getCps()
+        {
+                return cps;
         }
 }

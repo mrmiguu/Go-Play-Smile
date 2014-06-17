@@ -1,6 +1,8 @@
 import java.awt.Canvas;
 import java.awt.Frame;
 import java.awt.Graphics2D;
+import java.awt.Font;
+import java.awt.RenderingHints;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.KeyAdapter;
@@ -15,13 +17,14 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import javax.imageio.ImageIO;
 
-public final class Window
+final class Window
 {
         /*
          * Constants
          */
         private static final String TITLE = "Go-Play-Smile!";
         private static final short WIDTH = 1024, HEIGHT = 768;
+        private static final Font FONT = new Font("SansSerif", Font.PLAIN, 24);
         
         /*
          * Immutable fields
@@ -37,7 +40,7 @@ public final class Window
         /**
          * Prepares the canvas and frame for the game's window.
          */
-        public static void setup()
+        static void setup()
         {
                 canvas.setSize(WIDTH, HEIGHT);
                 
@@ -151,12 +154,16 @@ public final class Window
         /**
          * Draws the visuals of the game onto the window's canvas.
          */
-        public static void paint()
+        static void paint()
         {
                 final Graphics2D g = (Graphics2D)bufferStrategy.getDrawGraphics();
                 g.clearRect(0, 0, WIDTH, HEIGHT);
+                g.setFont(FONT);
+                g.setRenderingHint(
+                        RenderingHints.KEY_TEXT_ANTIALIASING,
+                        RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HRGB);
                 
-                
+                g.drawString("FPS: " + This.getFps() + " | CPS: " + This.getCps(), 2, 21);
                 
                 g.dispose();
                 bufferStrategy.show();
@@ -165,7 +172,7 @@ public final class Window
         /**
          * Clears and disposes of the window's objects.
          */
-        public static void unload()
+        static void unload()
         {
                 bufferStrategy.dispose();
                 frame.dispose();

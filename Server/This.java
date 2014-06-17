@@ -1,4 +1,4 @@
-public final class This
+final class This
 {
         /*
          * Constants
@@ -12,9 +12,9 @@ public final class This
         /*
          * Mutable fields
          */
+        private static boolean unloading;
         private static byte fps;
         private static int cps;
-        private static boolean unloading;
         
         /**
          * The main entry point for the server.
@@ -96,33 +96,13 @@ public final class This
         {
                 System.out.println("Unloaded!");
         }
-        
-        /**
-         * Retrieves the server's frame rate on a per second basis.
-         * 
-         * @return amount of frames per second
-         */
-        public static byte getFps()
-        {
-                return fps;
-        }
-        
-        /**
-         * Retrieves the server's cycle rate on a per second basis.
-         * 
-         * @return amount of cycle per second
-         */
-        public static int getCps()
-        {
-                return cps;
-        }
-        
+
         /**
          * Obtain the server's main thread's unloading status.
          * 
          * @return the unloading state
          */
-        public static boolean getUnloading()
+        static boolean getUnloading()
         {
                 synchronized (unloadingLock)
                 {
@@ -135,11 +115,31 @@ public final class This
          * 
          * @param state  the unloading state to-be
          */
-        public static void setUnloading(final boolean state)
+        static void setUnloading(final boolean state)
         {
                 synchronized (unloadingLock)
                 {
                         unloading = state;
                 }
+        }
+        
+        /**
+         * Retrieves the server's frame rate on a per second basis.
+         * 
+         * @return amount of frames per second
+         */
+        static byte getFps()
+        {
+                return fps;
+        }
+        
+        /**
+         * Retrieves the server's cycle rate on a per second basis.
+         * 
+         * @return amount of cycle per second
+         */
+        static int getCps()
+        {
+                return cps;
         }
 }

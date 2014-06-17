@@ -5,7 +5,7 @@ import java.lang.InterruptedException;
 /**
  * The server's console class.
  */
-public final class Console
+final class Console
 {
         /*
          * Constants
@@ -25,7 +25,7 @@ public final class Console
         /**
          * Our console's thread object.
          */
-        public static final Thread thread = new Thread()
+        static final Thread thread = new Thread()
         {
                 /**
                  * Initializes our console user prompt cycle.
@@ -109,7 +109,7 @@ public final class Console
          * 
          * @param x  the message to be forcefully printed
          */
-        public static void printMessage(final String x)
+        static void printMessage(final String x)
         {
                 synchronized (readingLock)
                 {
@@ -126,7 +126,7 @@ public final class Console
          * 
          * @return the reading state
          */
-        public static boolean getReading()
+        static boolean getReading()
         {
                 synchronized (readingLock)
                 {
@@ -139,7 +139,7 @@ public final class Console
          * 
          * @param state  the reading state to-be
          */
-        public static void setReading(final boolean state)
+        static void setReading(final boolean state)
         {
                 synchronized (readingLock)
                 {
