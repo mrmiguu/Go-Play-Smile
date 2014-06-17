@@ -47,9 +47,18 @@ final class This
          */
         private static void run()
         {
-                long timerLate = 0;
-                long timerFps = 0;
-                long timerCps = 0;
+                /*
+                 * Timer fields (these won't change from the 'long' primitive type)
+                 */
+                long
+                        timerLate = 0,
+                        timerPhysics = 0,
+                        timerFps = 0,
+                        timerCps = 0;
+                
+                /*
+                 * Counter fields (the primitive types here vary)
+                 */
                 byte counterFps = 0;
                 int counterCps = 0;
                 
@@ -64,6 +73,14 @@ final class This
                         {
                                 if (unloading) break;
                                 timerLate = CURRENT_TIME_MILLIS + 2500;
+                        }
+                        
+                        /*
+                         * The physics of the game run at half the frame rate (~30 fps)
+                         */
+                        if (timerPhysics < CURRENT_TIME_MILLIS)
+                        {
+                                timerPhysics = CURRENT_TIME_MILLIS + 30;
                         }
                         
                         /*

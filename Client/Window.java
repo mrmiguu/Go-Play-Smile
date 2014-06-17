@@ -3,10 +3,14 @@ import java.awt.Frame;
 import java.awt.Graphics2D;
 import java.awt.Font;
 import java.awt.RenderingHints;
+import java.awt.MouseInfo;
+import java.awt.Point;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -120,6 +124,22 @@ final class Window
                                         }
                                 }
                         });
+                        
+                canvas.addMouseListener(
+                        new MouseAdapter()
+                        {
+                                @Override
+                                public void mouseEntered(final MouseEvent e)
+                                {
+                                        
+                                }
+                                
+                                @Override
+                                public void mouseExited(final MouseEvent e)
+                                {
+                                        
+                                }
+                        });
 
                 canvas.requestFocus(); // allow key events to come our way
                 canvas.setIgnoreRepaint(true); // do the painting ourselves
@@ -163,7 +183,10 @@ final class Window
                         RenderingHints.KEY_TEXT_ANTIALIASING,
                         RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HRGB);
                 
-                g.drawString("FPS: " + This.getFps() + " | CPS: " + This.getCps(), 2, 21);
+                final Point mouse = MouseInfo.getPointerInfo().getLocation();
+                
+                g.drawString("FPS: " + This.getFps() + " | CPS: " + This.getCps(), 2, 21); // top-left corner
+                g.drawString("(Mouse) X: " + mouse.getX() + " | (Mouse) Y: " + mouse.getY(), 2, 45);
                 
                 g.dispose();
                 bufferStrategy.show();
