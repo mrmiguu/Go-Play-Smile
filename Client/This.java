@@ -67,7 +67,7 @@ public final class This
                         ++counterCps;
                         if (timerCps < CURRENT_TIME_MILLIS)
                         {
-                                Window.setTitle("FPS: " + counterFps + " | CPS: " + counterCps);
+                                System.out.println("FPS: " + counterFps + " | CPS: " + counterCps);
                                 counterCps = counterFps = 0;
                                 timerCps = CURRENT_TIME_MILLIS + 1000;
                         }

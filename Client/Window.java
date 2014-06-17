@@ -170,14 +170,4 @@ public final class Window
                 bufferStrategy.dispose();
                 frame.dispose();
         }
-        
-        /**
-         * Sets the title of the window's frame.
-         * 
-         * @param title  the title to-be
-         */
-        public static void setTitle(final String title)
-        {
-                frame.setTitle(title);
-        }
 }
