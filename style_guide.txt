@@ -4,7 +4,7 @@ FORMATTING:
 - Due to the rule above, all classes will be final classes (no need to extend).
 - Use the static & final keywords wherever possible (e.g. all formal method
   parameters should be final).
-- Use the least amount of memory/size required when using primitives data types.
+- Use the least amount of memory/size required when using primitive data types.
 - Use the private access modifier unless you have a good reason not to;
   otherwise, use no access modifier for simplicity and encapsulation purposes.
 
