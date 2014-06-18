@@ -28,24 +28,29 @@ final class Window
         /*
          * Constants
          */
+        static final byte N_SIDED_DIE = 6;
         private static final String TITLE = "Go-Play-Smile!";
         private static final short WIDTH = 1024, HEIGHT = 768;
+        private static final short CENTER_X = WIDTH >> 1, CENTER_Y = HEIGHT >> 1;
         private static final Font FONT = new Font("SansSerif", Font.PLAIN, 24);
-        static final byte N_SIDED_DIE = 6;
         
         /*
          * Immutable fields
          */
         private static final Frame frame = new Frame(TITLE);
         private static final Canvas canvas = new Canvas();
-        private static final BufferStrategy bufferStrategy = canvas.getBufferStrategy(); // will be reassigned once later
+        private static final BufferStrategy bufferStrategy = null; // will be reassigned once later
         private static final BufferedImage[] die = new BufferedImage[N_SIDED_DIE];
+        private static final BufferedImage gpsScreen = null; // will be reassigned once later
         private static final Random random = new Random();
         
         /*
          * Mutable fields
          */
-        private static byte dieTimer, dieCounter;
+        private static boolean showFpsCpsAndMouseCoordinates;
+        private static byte dieSpinTimer, dieFrame, dieStopCounter;
+        private static boolean showDieRoll = true, dieThrown;
+        private static byte dieSide = -1;
 
         /**
          * Prepares the canvas and frame for the game's window.
@@ -77,24 +82,9 @@ final class Window
                                 {
                                         switch (e.getKeyCode())
                                         {
-                                                case KeyEvent.VK_LEFT:
+                                                case KeyEvent.VK_F1:
                                                 {
-                                                        //Input.left((byte)1);
-                                                        break;
-                                                }
-                                                case KeyEvent.VK_UP:
-                                                {
-                                                        //Input.up((byte)1);
-                                                        break;
-                                                }
-                                                case KeyEvent.VK_RIGHT:
-                                                {
-                                                        //Input.right((byte)1);
-                                                        break;
-                                                }
-                                                case KeyEvent.VK_DOWN:
-                                                {
-                                                        //Input.down((byte)1);
+                                                        showFpsCpsAndMouseCoordinates = true;
                                                         break;
                                                 }
                                                 default: break;
@@ -106,24 +96,9 @@ final class Window
                                 {
                                         switch (e.getKeyCode())
                                         {
-                                                case KeyEvent.VK_LEFT:
+                                                case KeyEvent.VK_F1:
                                                 {
-                                                        //Input.left((byte)0);
-                                                        break;
-                                                }
-                                                        case KeyEvent.VK_UP:
-                                                {
-                                                        //Input.up((byte)0);
-                                                        break;
-                                                }
-                                                case KeyEvent.VK_RIGHT:
-                                                {
-                                                        //Input.right((byte)0);
-                                                        break;
-                                                }
-                                                case KeyEvent.VK_DOWN:
-                                                {
-                                                        //Input.down((byte)0);
+                                                        showFpsCpsAndMouseCoordinates = false;
                                                         break;
                                                 }
                                                 default: break;
@@ -135,15 +110,9 @@ final class Window
                         new MouseAdapter()
                         {
                                 @Override
-                                public void mouseEntered(final MouseEvent e)
+                                public void mouseClicked(MouseEvent e)
                                 {
-                                        
-                                }
-                                
-                                @Override
-                                public void mouseExited(final MouseEvent e)
-                                {
-                                        
+                                        if (showDieRoll) dieThrown = true;
                                 }
                         });
 
@@ -151,28 +120,8 @@ final class Window
                 canvas.setIgnoreRepaint(true); // do the painting ourselves
                 canvas.createBufferStrategy(2); // setup double-buffering
                 
-                /*
-                 * Attempt to set our buffer strategy (we only need to once after setting it up)
-                 */
-                try
-                {
-                        final Field tempField = Window.class.getDeclaredField("bufferStrategy");
-                        tempField.setAccessible(true);
-                        
-                        final Field modifiersField = Field.class.getDeclaredField("modifiers");
-                        modifiersField.setAccessible(true);
-                        modifiersField.setInt(tempField, tempField.getModifiers() & ~Modifier.FINAL);
-                        
-                        tempField.set(null, canvas.getBufferStrategy());
-                }
-                catch (IllegalAccessException e)
-                {
-                        System.out.println(e.getMessage());
-                }
-                catch (NoSuchFieldException e)
-                {
-                        System.out.println(e.getMessage());
-                }
+                // attempt to set our buffer strategy (we only need to once after setting it up)
+                setPrivateStaticFinal("bufferStrategy", canvas.getBufferStrategy());
                 
                 frame.setVisible(true); // we're ready to show them our stuff (no pun intended)
                 load();
@@ -186,6 +135,8 @@ final class Window
                         {
                                 die[s] = ImageIO.read(new File("Images/Die/" + (s + 1) + ".png"));
                         }
+                        
+                        setPrivateStaticFinal("gpsScreen", ImageIO.read(new File("Images/GPS_Screen.png")));
                 }
                 catch (IOException e)
                 {
@@ -204,30 +155,69 @@ final class Window
                 g.setRenderingHint(
                         RenderingHints.KEY_TEXT_ANTIALIASING,
                         RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HRGB);
-                
-                //final Point m = canvas.getMousePosition();
-                
-                g.drawString(
-                        "FPS: " + This.getFps() + " | CPS: " + NumberFormat.getIntegerInstance().format(This.getCps()),
-                        2, 21); // top-left corner
-                g.drawString("(Mouse) X: " + getMouseX() + " | (Mouse) Y: " + getMouseY(), 2, 45);
-                
-                g.drawImage(
-                        die[dieCounter], getMouseX() - die[dieCounter].getWidth() / 2,
-                        getMouseY() - die[dieCounter].getHeight() / 2, null);
-                
-                /*
-                 * Animate the die once every 6 frames
-                 */
-                if (++dieTimer >= 6)
-                {
-                        final byte nextFrame = (byte)random.nextInt(N_SIDED_DIE);
-                        dieCounter = dieCounter == nextFrame ? (byte)((nextFrame + 1) % N_SIDED_DIE) : nextFrame;
-                        dieTimer = 0;
-                }
-                
+
+                if (showFpsCpsAndMouseCoordinates) paintFpsCpsAndMouseCoordinates(g);
+                if (showDieRoll) paintDieRoll(g);
+
                 g.dispose();
                 bufferStrategy.show();
+        }
+        
+        /**
+         * Displays the FPS, CPS, and mouse coordinates onto the screen.
+         * 
+         * @param g  the handle to the graphical device
+         */
+        private static void paintFpsCpsAndMouseCoordinates(final Graphics2D g)
+        {
+                g.drawString(
+                        "FPS: " + This.getFps() + " | CPS: " + NumberFormat.getIntegerInstance().format(This.getCps()),
+                        2, 21);
+                g.drawString("(Mouse) X: " + getMouseX() + " | (Mouse) Y: " + getMouseY(), 2, 45);
+        }
+        
+        /**
+         * Displays the entire die rolling scene.
+         * 
+         * @param g  the handle to the graphical device
+         */
+        private static void paintDieRoll(final Graphics2D g)
+        {
+                g.drawImage(gpsScreen, CENTER_X - gpsScreen.getWidth() / 2, CENTER_Y - gpsScreen.getHeight() / 2, null);
+                
+                final short dieX, dieY;
+                
+                if (!dieThrown)
+                {
+                        dieX = (short)(getMouseX() - die[dieFrame].getWidth() / 2);
+                        dieY = (short)(getMouseY() - die[dieFrame].getHeight() / 2);
+                }
+                else dieY = dieX = 0;
+                
+                g.drawImage(die[dieFrame], dieX, dieY, null);
+
+                if (dieStopCounter >= 100)
+                {
+                        if (dieSide < 0 || dieSide > N_SIDED_DIE - 1)
+                        {
+                                dieSide = dieFrame;
+                                System.out.println("dieSide = " + (dieSide + 1));
+                        }
+                        return;
+                }
+                
+                /*
+                 * Animate the spinning die once every 6 frames (minimum)
+                 */
+                if (++dieSpinTimer >= 6 + (dieThrown ? dieStopCounter : 0))
+                {
+                        final byte nextFrame = (byte)random.nextInt(N_SIDED_DIE);
+                        dieFrame = dieFrame == nextFrame ? (byte)((nextFrame + 1) % N_SIDED_DIE) : nextFrame;
+                        dieSpinTimer = 0;
+                        
+                        if (!dieThrown) return;
+                        dieStopCounter += (dieStopCounter >> 2) + random.nextInt(10) + 1;
+                }
         }
         
         /**
@@ -243,6 +233,35 @@ final class Window
                 
                 bufferStrategy.dispose();
                 frame.dispose();
+        }
+ 
+        /**
+         * If possible, a private static final field's set value is changed.
+         * 
+         * @param field     the name of the field to change
+         * @param newValue  the desired new value of the field
+         */
+        private static void setPrivateStaticFinal(final String field, final Object newValue)
+        {
+                try
+                {
+                        final Field f = Window.class.getDeclaredField(field);
+                        f.setAccessible(true);
+                        
+                        final Field modifiersField = Field.class.getDeclaredField("modifiers");
+                        modifiersField.setAccessible(true);
+                        modifiersField.setInt(f, f.getModifiers() & ~Modifier.FINAL);
+                        
+                        f.set(null, newValue);
+                }
+                catch (IllegalAccessException e)
+                {
+                        System.out.println(e.getMessage());
+                }
+                catch (NoSuchFieldException e)
+                {
+                        System.out.println(e.getMessage());
+                }
         }
         
         private static short getMouseX()
