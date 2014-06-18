@@ -19,6 +19,8 @@ import java.lang.NoSuchFieldException;
 import java.lang.IllegalAccessException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.text.NumberFormat;
+import java.util.Random;
 import javax.imageio.ImageIO;
 
 final class Window
@@ -38,6 +40,7 @@ final class Window
         private static final Canvas canvas = new Canvas();
         private static final BufferStrategy bufferStrategy = canvas.getBufferStrategy(); // will be reassigned once later
         private static final BufferedImage[] die = new BufferedImage[N_SIDED_DIE];
+        private static final Random random = new Random();
         
         /*
          * Mutable fields
@@ -204,7 +207,9 @@ final class Window
                 
                 //final Point m = canvas.getMousePosition();
                 
-                g.drawString("FPS: " + This.getFps() + " | CPS: " + This.getCps(), 2, 21); // top-left corner
+                g.drawString(
+                        "FPS: " + This.getFps() + " | CPS: " + NumberFormat.getIntegerInstance().format(This.getCps()),
+                        2, 21); // top-left corner
                 g.drawString("(Mouse) X: " + getMouseX() + " | (Mouse) Y: " + getMouseY(), 2, 45);
                 
                 g.drawImage(
@@ -212,11 +217,12 @@ final class Window
                         getMouseY() - die[dieCounter].getHeight() / 2, null);
                 
                 /*
-                 * Animate the die once every 4 frames
+                 * Animate the die once every 6 frames
                  */
-                if (++dieTimer >= 4)
+                if (++dieTimer >= 6)
                 {
-                        dieCounter = (byte)((dieCounter + 1) % N_SIDED_DIE);
+                        final byte nextFrame = (byte)random.nextInt(N_SIDED_DIE);
+                        dieCounter = dieCounter == nextFrame ? (byte)((nextFrame + 1) % N_SIDED_DIE) : nextFrame;
                         dieTimer = 0;
                 }
                 
