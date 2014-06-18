@@ -29,6 +29,7 @@ final class Window
         private static final String TITLE = "Go-Play-Smile!";
         private static final short WIDTH = 1024, HEIGHT = 768;
         private static final Font FONT = new Font("SansSerif", Font.PLAIN, 24);
+        static final byte N_SIDED_DIE = 6;
         
         /*
          * Immutable fields
@@ -36,10 +37,12 @@ final class Window
         private static final Frame frame = new Frame(TITLE);
         private static final Canvas canvas = new Canvas();
         private static final BufferStrategy bufferStrategy = canvas.getBufferStrategy(); // will be reassigned once later
+        private static final BufferedImage[] die = new BufferedImage[N_SIDED_DIE];
         
         /*
          * Mutable fields
          */
+        private static byte dieTimer, dieCounter;
 
         /**
          * Prepares the canvas and frame for the game's window.
@@ -169,6 +172,22 @@ final class Window
                 }
                 
                 frame.setVisible(true); // we're ready to show them our stuff (no pun intended)
+                load();
+        }
+        
+        private static void load()
+        {
+                try
+                {
+                        for (byte s = (byte)(die.length - 1); s >= 0; --s)
+                        {
+                                die[s] = ImageIO.read(new File("Images/Die/" + (s + 1) + ".png"));
+                        }
+                }
+                catch (IOException e)
+                {
+                        System.out.println(e.getMessage());
+                }
         }
 
         /**
@@ -183,10 +202,23 @@ final class Window
                         RenderingHints.KEY_TEXT_ANTIALIASING,
                         RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HRGB);
                 
-                final Point mouse = MouseInfo.getPointerInfo().getLocation();
+                //final Point m = canvas.getMousePosition();
                 
                 g.drawString("FPS: " + This.getFps() + " | CPS: " + This.getCps(), 2, 21); // top-left corner
-                g.drawString("(Mouse) X: " + mouse.getX() + " | (Mouse) Y: " + mouse.getY(), 2, 45);
+                g.drawString("(Mouse) X: " + getMouseX() + " | (Mouse) Y: " + getMouseY(), 2, 45);
+                
+                g.drawImage(
+                        die[dieCounter], getMouseX() - die[dieCounter].getWidth() / 2,
+                        getMouseY() - die[dieCounter].getHeight() / 2, null);
+                
+                /*
+                 * Animate the die once every 4 frames
+                 */
+                if (++dieTimer >= 4)
+                {
+                        dieCounter = (byte)((dieCounter + 1) % N_SIDED_DIE);
+                        dieTimer = 0;
+                }
                 
                 g.dispose();
                 bufferStrategy.show();
@@ -197,7 +229,23 @@ final class Window
          */
         static void unload()
         {
+                for (byte s = 0; s < die.length; s++)
+                {
+                        die[s].flush();
+                        die[s] = null;
+                }
+                
                 bufferStrategy.dispose();
                 frame.dispose();
+        }
+        
+        private static short getMouseX()
+        {
+                return (short)(MouseInfo.getPointerInfo().getLocation().getX() - canvas.getLocationOnScreen().getX());
+        }
+        
+        private static short getMouseY()
+        {
+                return (short)(MouseInfo.getPointerInfo().getLocation().getY() - canvas.getLocationOnScreen().getY());
         }
 }
