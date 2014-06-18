@@ -5,6 +5,7 @@ import java.awt.Font;
 import java.awt.RenderingHints;
 import java.awt.MouseInfo;
 import java.awt.Point;
+import java.awt.Color;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.KeyAdapter;
@@ -13,6 +14,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
+import java.awt.font.LineBreakMeasurer;
 import java.io.File;
 import java.io.IOException;
 import java.lang.NoSuchFieldException;
@@ -48,6 +50,7 @@ final class Window
          * Mutable fields
          */
         private static boolean showFpsCpsAndMouseCoordinates;
+        private static byte instructionCard = (byte)random.nextInt(This.INSTRUCTION_CARDS.length);
         private static byte dieSpinTimer, dieFrame, dieStopCounter;
         private static boolean showDieRoll = true, dieThrown;
         private static byte dieSide = -1;
@@ -183,7 +186,20 @@ final class Window
          */
         private static void paintDieRoll(final Graphics2D g)
         {
-                g.drawImage(gpsScreen, CENTER_X - gpsScreen.getWidth() / 2, CENTER_Y - gpsScreen.getHeight() / 2, null);
+                final short GPS_SCREEN_X = (short)(CENTER_X - gpsScreen.getWidth() / 2);
+                final short GPS_SCREEN_Y = (short)(CENTER_Y - gpsScreen.getHeight() / 2);
+                
+                g.drawImage(gpsScreen, GPS_SCREEN_X, GPS_SCREEN_Y, null);
+                g.setPaint(Color.WHITE);
+                
+                for (byte l = 0; l < This.INSTRUCTION_CARDS[instructionCard].length; ++l)
+                {
+                        g.drawString(
+                                This.INSTRUCTION_CARDS[instructionCard][l], GPS_SCREEN_X + 75,
+                                GPS_SCREEN_Y + 175 + l * 24);
+                }
+                
+                g.setPaint(Color.BLACK);
                 
                 final short dieX, dieY;
                 
@@ -196,6 +212,9 @@ final class Window
                 
                 g.drawImage(die[dieFrame], dieX, dieY, null);
 
+                /*
+                 * Stop the die at some point eventually
+                 */
                 if (dieStopCounter >= 100)
                 {
                         if (dieSide < 0 || dieSide > N_SIDED_DIE - 1)

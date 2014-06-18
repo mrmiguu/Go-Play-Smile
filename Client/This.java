@@ -3,7 +3,7 @@ final class This
         /*
          * Constants
          */
-        public static final String[][] INSTRUCTION_CARDS =
+        static final String[][] INSTRUCTION_CARDS =
         {
                 {
                         "Traffic jam on 405 by Airport. All cars on 405 lose one turn. If you are not on 405, move one.",
