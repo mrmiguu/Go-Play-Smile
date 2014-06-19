@@ -151,6 +151,7 @@ final class Window
                         }
                         
                         setPrivateStaticFinal("gpsScreen", ImageIO.read(new File("Images/GPS_Screen.png")));
+                        setPrivateStaticFinal("map", ImageIO.read(new File("Images/Map.png")));
                 }
                 catch (IOException e)
                 {
@@ -169,30 +170,21 @@ final class Window
                 g.setRenderingHint(
                         RenderingHints.KEY_TEXT_ANTIALIASING,
                         RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HRGB);
-                
-                try
-                {
-                        setPrivateStaticFinal("map", ImageIO.read(new File("Images/Map.png")));
-                }
-                catch(IOException e)
-                {
-                    System.out.println(e.getMessage());
-                }
-                
-                if(WIDTH / 2 - getMouseX() > map.getWidth()&& HEIGHT / 2 - getMouseY() > map.getHeight())
-                g.drawImage(map, -WIDTH / 2, -HEIGHT / 2, null);
-                else if(WIDTH / 2 - getMouseX() > map.getWidth())
-                g.drawImage(map, -WIDTH / 2, HEIGHT / 2 - getMouseY(), null);
-                else if(HEIGHT / 2 - getMouseY() > map.getHeight())
-                g.drawImage(map, WIDTH / 2 - getMouseX(), -HEIGHT / 2, null);
-                else if(WIDTH / 2 > getMouseX() && HEIGHT / 2 > getMouseY())
-                g.drawImage(map, 0, 0, null);
-                else if(WIDTH / 2 > getMouseX())
-                g.drawImage(map, 0, HEIGHT / 2 - getMouseY(), null);
-                else if(HEIGHT / 2 > getMouseY())
-                g.drawImage(map, WIDTH / 2 - getMouseX(), 0, null);
+
+                if (WIDTH / 2 - getMouseX() > map.getWidth()&& HEIGHT / 2 - getMouseY() > map.getHeight())
+                        g.drawImage(map, -WIDTH / 2, -HEIGHT / 2, null);
+                else if (WIDTH / 2 - getMouseX() > map.getWidth())
+                        g.drawImage(map, -WIDTH / 2, HEIGHT / 2 - getMouseY(), null);
+                else if (HEIGHT / 2 - getMouseY() > map.getHeight())
+                        g.drawImage(map, WIDTH / 2 - getMouseX(), -HEIGHT / 2, null);
+                else if (WIDTH / 2 > getMouseX() && HEIGHT / 2 > getMouseY())
+                        g.drawImage(map, 0, 0, null);
+                else if (WIDTH / 2 > getMouseX())
+                        g.drawImage(map, 0, HEIGHT / 2 - getMouseY(), null);
+                else if (HEIGHT / 2 > getMouseY())
+                        g.drawImage(map, WIDTH / 2 - getMouseX(), 0, null);
                 else
-                g.drawImage(map, WIDTH / 2 - getMouseX(), HEIGHT / 2 - getMouseY(), null);
+                        g.drawImage(map, WIDTH / 2 - getMouseX(), HEIGHT / 2 - getMouseY(), null);
                 
 
                 if (showFpsCpsAndMouseCoordinates) paintFpsCpsAndMouseCoordinates(g);
