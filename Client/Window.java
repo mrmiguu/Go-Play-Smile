@@ -52,7 +52,7 @@ final class Window
         private static boolean showFpsCpsAndMouseCoordinates;
         private static byte instructionCard = (byte)random.nextInt(This.INSTRUCTION_CARDS.length);
         private static byte dieSpinTimer, dieFrame, dieStopCounter;
-        private static boolean showDieRoll = true, dieThrown;
+        private static boolean showDieRoll, dieThrown;
         private static byte dieSide = -1;
 
         /**
@@ -90,6 +90,11 @@ final class Window
                                                         showFpsCpsAndMouseCoordinates = true;
                                                         break;
                                                 }
+                                                case KeyEvent.VK_SPACE:
+                                                {
+                                                        showDieRoll = true;
+                                                        break;
+                                                }
                                                 default: break;
                                         }
                                 }
@@ -102,6 +107,11 @@ final class Window
                                                 case KeyEvent.VK_F1:
                                                 {
                                                         showFpsCpsAndMouseCoordinates = false;
+                                                        break;
+                                                }
+                                                case KeyEvent.VK_SPACE:
+                                                {
+                                                        showDieRoll = false;
                                                         break;
                                                 }
                                                 default: break;
