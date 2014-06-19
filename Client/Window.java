@@ -44,6 +44,7 @@ final class Window
         private static final BufferStrategy bufferStrategy = null; // will be reassigned once later
         private static final BufferedImage[] die = new BufferedImage[N_SIDED_DIE];
         private static final BufferedImage gpsScreen = null; // will be reassigned once later
+        private static final BufferedImage map = null; // will be reassigned once later
         private static final Random random = new Random();
         
         /*
@@ -168,6 +169,31 @@ final class Window
                 g.setRenderingHint(
                         RenderingHints.KEY_TEXT_ANTIALIASING,
                         RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HRGB);
+                
+                try
+                {
+                        setPrivateStaticFinal("map", ImageIO.read(new File("Images/Map.png")));
+                }
+                catch(IOException e)
+                {
+                    System.out.println(e.getMessage());
+                }
+                
+                if(WIDTH / 2 - getMouseX() > map.getWidth()&& HEIGHT / 2 - getMouseY() > map.getHeight())
+                g.drawImage(map, -WIDTH / 2, -HEIGHT / 2, null);
+                else if(WIDTH / 2 - getMouseX() > map.getWidth())
+                g.drawImage(map, -WIDTH / 2, HEIGHT / 2 - getMouseY(), null);
+                else if(HEIGHT / 2 - getMouseY() > map.getHeight())
+                g.drawImage(map, WIDTH / 2 - getMouseX(), -HEIGHT / 2, null);
+                else if(WIDTH / 2 > getMouseX() && HEIGHT / 2 > getMouseY())
+                g.drawImage(map, 0, 0, null);
+                else if(WIDTH / 2 > getMouseX())
+                g.drawImage(map, 0, HEIGHT / 2 - getMouseY(), null);
+                else if(HEIGHT / 2 > getMouseY())
+                g.drawImage(map, WIDTH / 2 - getMouseX(), 0, null);
+                else
+                g.drawImage(map, WIDTH / 2 - getMouseX(), HEIGHT / 2 - getMouseY(), null);
+                
 
                 if (showFpsCpsAndMouseCoordinates) paintFpsCpsAndMouseCoordinates(g);
                 if (showDieRoll) paintDieRoll(g);
