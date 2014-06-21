@@ -64,7 +64,7 @@ final class Window
         static void setup()
         {
                 canvas.setSize(WIDTH, HEIGHT);
-                
+
                 frame.add(canvas);
                 frame.setResizable(false);
                 frame.pack();
@@ -117,7 +117,7 @@ final class Window
                                         }
                                 }
                         });
-                        
+
                 canvas.addMouseListener(
                         new MouseAdapter()
                         {
@@ -131,6 +131,7 @@ final class Window
                                 }
                         });
 
+                System.out.println(frame.hasFocus()); // allow key events to come our way
                 canvas.setIgnoreRepaint(true); // do the painting ourselves
                 canvas.createBufferStrategy(2); // setup double-buffering
                 
@@ -139,7 +140,6 @@ final class Window
 
                 load();
                 frame.setVisible(true); // we're ready to show them our stuff (no pun intended)
-                frame.requestFocus(); // allow key events to come our way
         }
         
         private static void load()
