@@ -34,6 +34,7 @@ final class Window
         private static final String TITLE = "Go-Play-Smile!";
         private static final short WIDTH = 1024, HEIGHT = 768;
         private static final short CENTER_X = WIDTH >> 1, CENTER_Y = HEIGHT >> 1;
+        private static final Short GPS_SCREEN_X = null, GPS_SCREEN_Y = null;
         private static final Font FONT = new Font("SansSerif", Font.PLAIN, 24);
         
         /*
@@ -55,6 +56,7 @@ final class Window
         private static byte dieSpinTimer, dieFrame, dieStopCounter;
         private static boolean showDieRoll, dieThrown;
         private static byte dieSide = -1;
+        private static boolean showMap = true;
 
         /**
          * Prepares the canvas and frame for the game's window.
@@ -93,7 +95,8 @@ final class Window
                                                 }
                                                 case KeyEvent.VK_SPACE:
                                                 {
-                                                        showDieRoll = true;
+                                                        if (showDieRoll) resetDieRoll();
+                                                        showDieRoll = !showDieRoll;
                                                         break;
                                                 }
                                                 default: break;
@@ -110,11 +113,6 @@ final class Window
                                                         showFpsCpsAndMouseCoordinates = false;
                                                         break;
                                                 }
-                                                case KeyEvent.VK_SPACE:
-                                                {
-                                                        showDieRoll = false;
-                                                        break;
-                                                }
                                                 default: break;
                                         }
                                 }
@@ -126,19 +124,22 @@ final class Window
                                 @Override
                                 public void mouseClicked(MouseEvent e)
                                 {
-                                        if (showDieRoll) dieThrown = true;
+                                        if (showDieRoll)
+                                        {
+                                                dieThrown = true;
+                                        }
                                 }
                         });
 
-                canvas.requestFocus(); // allow key events to come our way
                 canvas.setIgnoreRepaint(true); // do the painting ourselves
                 canvas.createBufferStrategy(2); // setup double-buffering
                 
                 // attempt to set our buffer strategy (we only need to once after setting it up)
                 setPrivateStaticFinal("bufferStrategy", canvas.getBufferStrategy());
-                
-                frame.setVisible(true); // we're ready to show them our stuff (no pun intended)
+
                 load();
+                frame.setVisible(true); // we're ready to show them our stuff (no pun intended)
+                frame.requestFocus(); // allow key events to come our way
         }
         
         private static void load()
@@ -151,6 +152,8 @@ final class Window
                         }
                         
                         setPrivateStaticFinal("gpsScreen", ImageIO.read(new File("Images/GPS_Screen.png")));
+                        setPrivateStaticFinal("GPS_SCREEN_X", (short)(CENTER_X - gpsScreen.getWidth() / 2));
+                        setPrivateStaticFinal("GPS_SCREEN_Y", (short)(CENTER_Y - gpsScreen.getHeight() / 2));
                         setPrivateStaticFinal("map", ImageIO.read(new File("Images/Map.png")));
                 }
                 catch (IOException e)
@@ -171,22 +174,7 @@ final class Window
                         RenderingHints.KEY_TEXT_ANTIALIASING,
                         RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HRGB);
 
-                if (WIDTH / 2 - getMouseX() > map.getWidth()&& HEIGHT / 2 - getMouseY() > map.getHeight())
-                        g.drawImage(map, -WIDTH / 2, -HEIGHT / 2, null);
-                else if (WIDTH / 2 - getMouseX() > map.getWidth())
-                        g.drawImage(map, -WIDTH / 2, HEIGHT / 2 - getMouseY(), null);
-                else if (HEIGHT / 2 - getMouseY() > map.getHeight())
-                        g.drawImage(map, WIDTH / 2 - getMouseX(), -HEIGHT / 2, null);
-                else if (WIDTH / 2 > getMouseX() && HEIGHT / 2 > getMouseY())
-                        g.drawImage(map, 0, 0, null);
-                else if (WIDTH / 2 > getMouseX())
-                        g.drawImage(map, 0, HEIGHT / 2 - getMouseY(), null);
-                else if (HEIGHT / 2 > getMouseY())
-                        g.drawImage(map, WIDTH / 2 - getMouseX(), 0, null);
-                else
-                        g.drawImage(map, WIDTH / 2 - getMouseX(), HEIGHT / 2 - getMouseY(), null);
-                
-
+                if (showMap) paintMap(g);
                 if (showFpsCpsAndMouseCoordinates) paintFpsCpsAndMouseCoordinates(g);
                 if (showDieRoll) paintDieRoll(g);
 
@@ -208,15 +196,30 @@ final class Window
         }
         
         /**
+         * Allows for a rethrow of the die.
+         */
+        private static void resetDieRoll()
+        {
+                dieStopCounter = dieFrame = dieSpinTimer = 0;
+                dieThrown = false;
+                dieSide = -1;
+                
+                /*
+                 * For now this is just set to some other randome card. Eventually we want this to simulate a used-card
+                 * stack where we're only picking random cards from the new-card stack and used ones are disposed of.
+                 * Once the used-card stack contains all of the instruction cards available, we can shuffle the used-
+                 * card stack so that it will become the new-card stack
+                 */
+                instructionCard = (byte)random.nextInt(This.INSTRUCTION_CARDS.length);
+        }
+        
+        /**
          * Displays the entire die rolling scene.
          * 
          * @param g  the handle to the graphical device
          */
         private static void paintDieRoll(final Graphics2D g)
         {
-                final short GPS_SCREEN_X = (short)(CENTER_X - gpsScreen.getWidth() / 2);
-                final short GPS_SCREEN_Y = (short)(CENTER_Y - gpsScreen.getHeight() / 2);
-                
                 g.drawImage(gpsScreen, GPS_SCREEN_X, GPS_SCREEN_Y, null);
                 g.setPaint(Color.WHITE);
                 
@@ -265,6 +268,29 @@ final class Window
                         if (!dieThrown) return;
                         dieStopCounter += (dieStopCounter >> 2) + random.nextInt(10) + 1;
                 }
+        }
+        
+        /**
+         * Displays the entire map screen.
+         * 
+         * @param g  the handle to the graphical device
+         */
+        private static void paintMap(final Graphics2D g)
+        {
+                final short mouseX = getMouseX(), mouseY = getMouseY(); // cache for better speed
+                final int // it's possible that the map can be HUGE, so the difference would pass 32k
+                        mapScreenWidthDiff = WIDTH - map.getWidth(),
+                        mapScreenHeightDiff = HEIGHT - map.getHeight();
+                final int mapX, mapY;
+                
+                if (mouseX < 0) mapX = 0;
+                else if (mouseX > WIDTH) mapX = mapScreenWidthDiff;
+                else mapX = (int)(mouseX * ((float)mapScreenWidthDiff / WIDTH));
+                if (mouseY < 0) mapY = 0;
+                else if (mouseY > HEIGHT) mapY = mapScreenHeightDiff;
+                else mapY = (int)(mouseY * ((float)mapScreenHeightDiff / HEIGHT));
+                
+                g.drawImage(map, mapX, mapY, null);
         }
         
         /**

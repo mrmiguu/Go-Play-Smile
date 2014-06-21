@@ -7,6 +7,8 @@ FORMATTING:
 - Use the least amount of memory/size required when using primitive data types.
 - Use the private access modifier unless you have a good reason not to;
   otherwise, use no access modifier for simplicity and encapsulation purposes.
+- All unary operators that are not postfix/prefix dependent should be set to
+  prefix (e.g. "--i" or "++i").
 
 STYLE:
 - All indentation should be 8-spaces (set the tab width to a size of 8).
