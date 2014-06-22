@@ -42,17 +42,18 @@ final class Window
          */
         private static final Frame frame = new Frame(TITLE);
         private static final Canvas canvas = new Canvas();
-        private static final BufferStrategy bufferStrategy = null; // will be reassigned once later
+        private static final BufferStrategy bufferStrategy = null; // reassigned later
         private static final BufferedImage[] die = new BufferedImage[N_SIDED_DIE];
-        private static final BufferedImage gpsScreen = null; // will be reassigned once later
-        private static final BufferedImage map = null; // will be reassigned once later
+        private static final BufferedImage gpsScreen = null; // reassigned later
+        private static final BufferedImage map = null; // reassigned later
         private static final Random random = new Random();
         
         /*
          * Mutable fields
          */
         private static boolean showFpsCpsAndMouseCoordinates;
-        private static byte instructionCard = (byte)random.nextInt(This.INSTRUCTION_CARDS.length);
+        private static byte instructionCard =
+                (byte)random.nextInt(This.INSTRUCTION_CARDS.length);
         private static byte dieSpinTimer, dieFrame, dieStopCounter;
         private static boolean showDieRoll, dieThrown;
         private static byte dieSide = -1;
@@ -64,7 +65,6 @@ final class Window
         static void setup()
         {
                 canvas.setSize(WIDTH, HEIGHT);
-
                 frame.add(canvas);
                 frame.setResizable(false);
                 frame.pack();
@@ -79,7 +79,6 @@ final class Window
                                         This.setUnloading(true);
                                 }
                         });
-       
                 canvas.addKeyListener(
                         new KeyAdapter()
                         {
@@ -90,7 +89,8 @@ final class Window
                                         {
                                                 case KeyEvent.VK_F1:
                                                 {
-                                                        showFpsCpsAndMouseCoordinates = true;
+                                                        showFpsCpsAndMouseCoordinates =
+                                                                true;
                                                         break;
                                                 }
                                                 case KeyEvent.VK_SPACE:
@@ -110,14 +110,14 @@ final class Window
                                         {
                                                 case KeyEvent.VK_F1:
                                                 {
-                                                        showFpsCpsAndMouseCoordinates = false;
+                                                        showFpsCpsAndMouseCoordinates =
+                                                                false;
                                                         break;
                                                 }
                                                 default: break;
                                         }
                                 }
                         });
-
                 canvas.addMouseListener(
                         new MouseAdapter()
                         {
@@ -130,31 +130,46 @@ final class Window
                                         }
                                 }
                         });
-
-                System.out.println(frame.hasFocus()); // allow key events to come our way
                 canvas.setIgnoreRepaint(true); // do the painting ourselves
                 canvas.createBufferStrategy(2); // setup double-buffering
                 
-                // attempt to set our buffer strategy (we only need to once after setting it up)
-                setPrivateStaticFinal("bufferStrategy", canvas.getBufferStrategy());
+                // try re-setting our buffer strategy since we'll only ever need to once
+                General.setPrivateStaticFinal(
+                        Window.class, "bufferStrategy", canvas.getBufferStrategy());
 
                 load();
-                frame.setVisible(true); // we're ready to show them our stuff (no pun intended)
+                frame.setVisible(true);
+		System.out.println(
+			"canvas.requestFocusInWindow() = "
+			+ canvas.requestFocusInWindow());
         }
         
+        /**
+         * Load in all buffered images from their respective locations.
+         */
         private static void load()
         {
                 try
                 {
                         for (byte s = (byte)(die.length - 1); s >= 0; --s)
                         {
-                                die[s] = ImageIO.read(new File("Images/Die/" + (s + 1) + ".png"));
+                                die[s] =
+                                        ImageIO.read(
+                                                new File("Images/Die/" + (s + 1) + ".png"));
                         }
                         
-                        setPrivateStaticFinal("gpsScreen", ImageIO.read(new File("Images/GPS_Screen.png")));
-                        setPrivateStaticFinal("GPS_SCREEN_X", (short)(CENTER_X - gpsScreen.getWidth() / 2));
-                        setPrivateStaticFinal("GPS_SCREEN_Y", (short)(CENTER_Y - gpsScreen.getHeight() / 2));
-                        setPrivateStaticFinal("map", ImageIO.read(new File("Images/Map.png")));
+                        General.setPrivateStaticFinal(
+                                Window.class, "gpsScreen",
+                                ImageIO.read(new File("Images/GPS_Screen.png")));
+                        General.setPrivateStaticFinal(
+                                Window.class, "GPS_SCREEN_X",
+                                (short)(CENTER_X - gpsScreen.getWidth() / 2));
+                        General.setPrivateStaticFinal(
+                                Window.class, "GPS_SCREEN_Y",
+                                (short)(CENTER_Y - gpsScreen.getHeight() / 2));
+                        General.setPrivateStaticFinal(
+                                Window.class, "map",
+                                ImageIO.read(new File("Images/Map.png")));
                 }
                 catch (IOException e)
                 {
@@ -190,9 +205,11 @@ final class Window
         private static void paintFpsCpsAndMouseCoordinates(final Graphics2D g)
         {
                 g.drawString(
-                        "FPS: " + This.getFps() + " | CPS: " + NumberFormat.getIntegerInstance().format(This.getCps()),
+                        "FPS: " + This.getFps() + " | CPS: "
+                        + NumberFormat.getIntegerInstance().format(This.getCps()),
                         2, 21);
-                g.drawString("(Mouse) X: " + getMouseX() + " | (Mouse) Y: " + getMouseY(), 2, 45);
+                g.drawString(
+                        "(Mouse) X: " + getMouseX() + " | (Mouse) Y: " + getMouseY(), 2, 45);
         }
         
         /**
@@ -205,10 +222,11 @@ final class Window
                 dieSide = -1;
                 
                 /*
-                 * For now this is just set to some other randome card. Eventually we want this to simulate a used-card
-                 * stack where we're only picking random cards from the new-card stack and used ones are disposed of.
-                 * Once the used-card stack contains all of the instruction cards available, we can shuffle the used-
-                 * card stack so that it will become the new-card stack
+                 * For now this is just set to some other randome card. Eventually we want
+                 * this to simulate a used-card stack where we're only picking random cards
+                 * from the new-card stack and used ones are disposed of. Once the used-card
+                 * stack contains all of the instruction cards available, we can shuffle the
+                 * used-card stack so that it will become the new-card stack
                  */
                 instructionCard = (byte)random.nextInt(This.INSTRUCTION_CARDS.length);
         }
@@ -226,8 +244,8 @@ final class Window
                 for (byte l = 0; l < This.INSTRUCTION_CARDS[instructionCard].length; ++l)
                 {
                         g.drawString(
-                                This.INSTRUCTION_CARDS[instructionCard][l], GPS_SCREEN_X + 75,
-                                GPS_SCREEN_Y + 175 + l * 24);
+                                This.INSTRUCTION_CARDS[instructionCard][l],
+                                GPS_SCREEN_X + 75, GPS_SCREEN_Y + 175 + l * 24);
                 }
                 
                 g.setPaint(Color.BLACK);
@@ -262,7 +280,10 @@ final class Window
                 if (++dieSpinTimer >= 6 + (dieThrown ? dieStopCounter : 0))
                 {
                         final byte nextFrame = (byte)random.nextInt(N_SIDED_DIE);
-                        dieFrame = dieFrame == nextFrame ? (byte)((nextFrame + 1) % N_SIDED_DIE) : nextFrame;
+                        dieFrame =
+                                dieFrame == nextFrame
+                                ? (byte)((nextFrame + 1) % N_SIDED_DIE)
+                                : nextFrame;
                         dieSpinTimer = 0;
                         
                         if (!dieThrown) return;
@@ -277,8 +298,8 @@ final class Window
          */
         private static void paintMap(final Graphics2D g)
         {
-                final short mouseX = getMouseX(), mouseY = getMouseY(); // cache for better speed
-                final int // it's possible that the map can be HUGE, so the difference would pass 32k
+                final short mouseX = getMouseX(), mouseY = getMouseY();
+                final int // with a huge map the difference could pass 32k
                         mapScreenWidthDiff = WIDTH - map.getWidth(),
                         mapScreenHeightDiff = HEIGHT - map.getHeight();
                 final int mapX, mapY;
@@ -307,43 +328,18 @@ final class Window
                 bufferStrategy.dispose();
                 frame.dispose();
         }
- 
-        /**
-         * If possible, a private static final field's set value is changed.
-         * 
-         * @param field     the name of the field to change
-         * @param newValue  the desired new value of the field
-         */
-        private static void setPrivateStaticFinal(final String field, final Object newValue)
-        {
-                try
-                {
-                        final Field f = Window.class.getDeclaredField(field);
-                        f.setAccessible(true);
-                        
-                        final Field modifiersField = Field.class.getDeclaredField("modifiers");
-                        modifiersField.setAccessible(true);
-                        modifiersField.setInt(f, f.getModifiers() & ~Modifier.FINAL);
-                        
-                        f.set(null, newValue);
-                }
-                catch (IllegalAccessException e)
-                {
-                        System.out.println(e.getMessage());
-                }
-                catch (NoSuchFieldException e)
-                {
-                        System.out.println(e.getMessage());
-                }
-        }
         
         private static short getMouseX()
         {
-                return (short)(MouseInfo.getPointerInfo().getLocation().getX() - canvas.getLocationOnScreen().getX());
+                return
+                        (short)(MouseInfo.getPointerInfo().getLocation().getX()
+                        - canvas.getLocationOnScreen().getX());
         }
         
         private static short getMouseY()
         {
-                return (short)(MouseInfo.getPointerInfo().getLocation().getY() - canvas.getLocationOnScreen().getY());
+                return
+                        (short)(MouseInfo.getPointerInfo().getLocation().getY()
+                        - canvas.getLocationOnScreen().getY());
         }
 }

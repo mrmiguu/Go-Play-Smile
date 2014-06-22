@@ -9,6 +9,8 @@ FORMATTING:
   otherwise, use no access modifier for simplicity and encapsulation purposes.
 - All unary operators that are not postfix/prefix dependent should be set to
   prefix (e.g. "--i" or "++i").
+- Replace all multiplication of "1, 2, 4, 8, ..." with "<<" of "0, 1, 2, 3, ..."
+- Replace all division of "1, 2, 4, 8, ..." with ">>" of "0, 1, 2, 3, ..."
 
 STYLE:
 - All indentation should be 8-spaces (set the tab width to a size of 8).
