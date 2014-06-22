@@ -122,7 +122,7 @@ final class Window
                         new MouseAdapter()
                         {
                                 @Override
-                                public void mouseClicked(MouseEvent e)
+                                public void mouseClicked(final MouseEvent e)
                                 {
                                         if (showDieRoll)
                                         {
