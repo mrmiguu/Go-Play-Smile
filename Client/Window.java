@@ -23,6 +23,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.text.NumberFormat;
 import java.util.Random;
+import java.util.Stack;
 import javax.imageio.ImageIO;
 
 final class Window
@@ -47,6 +48,7 @@ final class Window
         private static final BufferedImage gpsScreen = null; // reassigned later
         private static final BufferedImage map = null; // reassigned later
         private static final Random random = new Random();
+        private static final Stack<String[]> newDeck = new Stack(), oldDeck = new Stack();
         
         /*
          * Mutable fields
