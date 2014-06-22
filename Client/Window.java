@@ -342,4 +342,23 @@ final class Window
                         (short)(MouseInfo.getPointerInfo().getLocation().getY()
                         - canvas.getLocationOnScreen().getY());
         }
+        
+        /**
+         * Goes through a deck of cards sequentially and swaps with another card at a random
+         * position somewhere inside of the deck.
+         * 
+         * @param deck  the deck of 6-lined cards
+         */
+        private static void shuffleDeck(final String[][] deck)
+        {
+                for (byte c = deck.length - 1; c >= 0; --c)
+                {
+                        final byte randomIndex = random.nextInt(c + 1);
+                        final String[] randomCard = deck[randomIndex];
+                        
+                        // swap
+                        deck[randomIndex] = deck[c];
+                        deck[c] = randomCard;
+                }
+        }
 }
