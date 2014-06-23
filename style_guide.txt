@@ -11,6 +11,7 @@ FORMATTING:
   prefix (e.g. "--i" or "++i").
 - Replace all multiplication of "1, 2, 4, 8, ..." with "<<" of "0, 1, 2, 3, ..."
 - Replace all division of "1, 2, 4, 8, ..." with ">>" of "0, 1, 2, 3, ..."
+- All for loops should be setup in reverse sequential order.
 
 STYLE:
 - All indentation should be 8-spaces (set the tab width to a size of 8).
