@@ -48,7 +48,7 @@ final class Window
         private static final BufferedImage gpsScreen = null; // reassigned later
         private static final BufferedImage map = null; // reassigned later
         private static final Random random = new Random();
-        private static final Stack<String[]> newDeck = new Stack(), oldDeck = new Stack();
+        private static final Stack<Byte> newDeck = new Stack(), oldDeck = new Stack();
         
         /*
          * Mutable fields
@@ -66,6 +66,12 @@ final class Window
          */
         static void setup()
         {
+            
+                for (byte i = 0; i < This.INSTRUCTION_CARDS.length; ++i)
+                        newDeck.push(i);
+                        
+                shuffleDeck(This.INSTRUCTION_CARDS);
+                        
                 canvas.setSize(WIDTH, HEIGHT);
                 frame.add(canvas);
                 frame.setResizable(false);
@@ -141,9 +147,9 @@ final class Window
 
                 load();
                 frame.setVisible(true);
-		System.out.println(
-			"canvas.requestFocusInWindow() = "
-			+ canvas.requestFocusInWindow());
+                System.out.println(
+                    "canvas.requestFocusInWindow() = "
+                    + canvas.requestFocusInWindow());
         }
         
         /**
@@ -230,7 +236,20 @@ final class Window
                  * stack contains all of the instruction cards available, we can shuffle the
                  * used-card stack so that it will become the new-card stack
                  */
-                instructionCard = (byte)random.nextInt(This.INSTRUCTION_CARDS.length);
+                instructionCard = newDeck.peek();
+                oldDeck.push(newDeck.pop());
+                
+                if (newDeck.size() == 0)
+                {
+                        while (!oldDeck.empty())
+                                oldDeck.pop();
+                    
+                        for (byte i = 0; i < This.INSTRUCTION_CARDS.length; ++i)
+                                newDeck.push(i);
+                                
+                        shuffleDeck(This.INSTRUCTION_CARDS);
+                }
+               
         }
         
         /**
@@ -353,9 +372,9 @@ final class Window
          */
         private static void shuffleDeck(final String[][] deck)
         {
-                for (byte c = deck.length - 1; c >= 0; --c)
+                for (byte c = (byte)(deck.length - 1) ;c >= 0; --c)
                 {
-                        final byte randomIndex = random.nextInt(c + 1);
+                        final byte randomIndex = (byte)random.nextInt(c + 1);
                         final String[] randomCard = deck[randomIndex];
                         
                         // swap

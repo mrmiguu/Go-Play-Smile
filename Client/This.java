@@ -11,7 +11,7 @@ final class This
                         "Shopping spree on RODEO Drive. Go To B. Hills.",
                         "Freeway wide open today. Move forward two.",
                         "Your birthday. Take friend to Hollywood Bowl.",
-                        "New DIamond Lane opens. Zip forward three."
+                        "New Diamond Lane opens. Zip forward three."
                 },
                 {
                         "Go directly to Hollywood to see movie stars.",
