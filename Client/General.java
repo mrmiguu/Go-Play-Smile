@@ -1,5 +1,3 @@
-import java.lang.NoSuchFieldException;
-import java.lang.IllegalAccessException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 
@@ -32,11 +30,11 @@ final class General
 
                         f.set(null, value);
                 }
-                catch (IllegalAccessException e)
+                catch (final IllegalAccessException e)
                 {
                         System.out.println(e.getMessage());
                 }
-                catch (NoSuchFieldException e)
+                catch (final NoSuchFieldException e)
                 {
                         System.out.println(e.getMessage());
                 }

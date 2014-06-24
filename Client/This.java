@@ -360,10 +360,10 @@ final class This
                  * Timer fields (these won't change from the 'long' primitive type)
                  */
                 long
-                        timerLate = 0,
-                        timerPhysics = 0,
-                        timerFps = 0,
-                        timerCps = 0;
+                        timer2500 = 0,
+                        timer30 = 0,
+                        timer15 = 0,
+                        timer1000 = 0;
                 
                 /*
                  * Counter fields (the primitive types here vary)
@@ -378,41 +378,41 @@ final class This
                         /*
                          * Late events are initiated here
                          */
-                        if (timerLate < CURRENT_TIME_MILLIS)
+                        if (timer2500 < CURRENT_TIME_MILLIS)
                         {
                                 if (unloading) break;
-                                timerLate = CURRENT_TIME_MILLIS + 2500;
+                                timer2500 = CURRENT_TIME_MILLIS + 2500;
                         }
                         
                         /*
                          * The physics of the game run at half the frame rate (~30 fps)
                          */
-                        if (timerPhysics < CURRENT_TIME_MILLIS)
+                        if (timer30 < CURRENT_TIME_MILLIS)
                         {
-                                timerPhysics = CURRENT_TIME_MILLIS + 30;
+                                timer30 = CURRENT_TIME_MILLIS + 30;
                         }
                         
                         /*
                          * The frame rate is processed and counted
                          */
-                        if (timerFps < CURRENT_TIME_MILLIS)
+                        if (timer15 < CURRENT_TIME_MILLIS)
                         {
                                 Window.paint();
                                 
                                 ++counterFps; // counterFps++ (post-increment) has to remember the old value
-                                timerFps = CURRENT_TIME_MILLIS + 15; // adjusts so FPS is ~60
+                                timer15 = CURRENT_TIME_MILLIS + 15; // adjusts so FPS is ~60
                         }
                         
                         /*
                          * The last thing calculated is the amount of cycles per second
                          */
                         ++counterCps;
-                        if (timerCps < CURRENT_TIME_MILLIS)
+                        if (timer1000 < CURRENT_TIME_MILLIS)
                         {
                                 fps = counterFps;
                                 cps = counterCps;
                                 counterCps = counterFps = 0;
-                                timerCps = CURRENT_TIME_MILLIS + 1000;
+                                timer1000 = CURRENT_TIME_MILLIS + 1000;
                         }
                 }
         }

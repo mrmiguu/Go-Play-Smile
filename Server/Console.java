@@ -43,7 +43,9 @@ final class Console
                                 final String in = scanner.nextLine().trim().toLowerCase();
                                 
                                 if (
-                                        in.equals("shutdown")
+                                        in.equals("off")
+                                        || in.equals("stop")
+                                        || in.equals("shutdown")
                                         || in.equals("exit")
                                         || in.equals("close")
                                         || in.equals("quit")
@@ -59,7 +61,9 @@ final class Console
                                         break;
                                 }
                                 else if (
-                                        in.equals("start")
+                                        in.equals("on")
+                                        || in.equals("open")
+                                        || in.equals("start")
                                         || in.equals("init")
                                         || in.equals("initialize")
                                         || in.equals("run")
@@ -86,18 +90,20 @@ final class Console
                                         || in.equals("cycles")
                                         || in.equals("cycle count"))
                                 {
-                                        System.out.println(NumberFormat.getIntegerInstance().format(This.getCps()));
+                                        System.out.println(
+                                                NumberFormat.getIntegerInstance().format(
+                                                        This.getCps()));
                                 }
                                 
                                 System.out.print(PROMPT);
                                 
                                 try
                                 {
-                                        this.sleep(1000);
+                                        sleep(1000);
                                 }
-                                catch (InterruptedException e)
+                                catch (final InterruptedException e)
                                 {
-                                        this.interrupt();
+                                        interrupt();
                                         System.out.println(e.getMessage());
                                 }
                         }

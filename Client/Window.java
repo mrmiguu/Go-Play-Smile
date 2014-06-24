@@ -15,15 +15,13 @@ import java.awt.event.MouseEvent;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.awt.font.LineBreakMeasurer;
+import java.awt.font.TextAttribute;
+import java.awt.font.TextLayout;
 import java.io.File;
 import java.io.IOException;
-import java.lang.NoSuchFieldException;
-import java.lang.IllegalAccessException;
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
+import java.text.AttributedString;
 import java.text.NumberFormat;
 import java.util.Random;
-import java.util.Stack;
 import javax.imageio.ImageIO;
 
 final class Window
@@ -31,7 +29,7 @@ final class Window
         /*
          * Constants
          */
-        static final byte N_SIDED_DIE = 6;
+        private static final byte N_SIDED_DIE = 6;
         private static final String TITLE = "Go-Play-Smile!";
         private static final short WIDTH = 1024, HEIGHT = 768;
         private static final short CENTER_X = WIDTH >> 1, CENTER_Y = HEIGHT >> 1;
@@ -48,14 +46,12 @@ final class Window
         private static final BufferedImage gpsScreen = null; // reassigned later
         private static final BufferedImage map = null; // reassigned later
         private static final Random random = new Random();
-        private static final Stack<Byte> newDeck = new Stack(), oldDeck = new Stack();
         
         /*
          * Mutable fields
          */
         private static boolean showFpsCpsAndMouseCoordinates;
-        private static byte instructionCard =
-                (byte)random.nextInt(This.INSTRUCTION_CARDS.length);
+        private static byte instructionCard;
         private static byte dieSpinTimer, dieFrame, dieStopCounter;
         private static boolean showDieRoll, dieThrown;
         private static byte dieSide = -1;
@@ -66,10 +62,6 @@ final class Window
          */
         static void setup()
         {
-            
-                for (byte i = 0; i < This.INSTRUCTION_CARDS.length; ++i)
-                        newDeck.push(i);
-                        
                 shuffleDeck(This.INSTRUCTION_CARDS);
                         
                 canvas.setSize(WIDTH, HEIGHT);
@@ -98,7 +90,7 @@ final class Window
                                                 case KeyEvent.VK_F1:
                                                 {
                                                         showFpsCpsAndMouseCoordinates =
-                                                                true;
+                                                                !showFpsCpsAndMouseCoordinates;
                                                         break;
                                                 }
                                                 case KeyEvent.VK_SPACE:
@@ -116,12 +108,6 @@ final class Window
                                 {
                                         switch (e.getKeyCode())
                                         {
-                                                case KeyEvent.VK_F1:
-                                                {
-                                                        showFpsCpsAndMouseCoordinates =
-                                                                false;
-                                                        break;
-                                                }
                                                 default: break;
                                         }
                                 }
@@ -146,10 +132,10 @@ final class Window
                         Window.class, "bufferStrategy", canvas.getBufferStrategy());
 
                 load();
+                frame.setLocationRelativeTo(null);
                 frame.setVisible(true);
                 System.out.println(
-                    "canvas.requestFocusInWindow() = "
-                    + canvas.requestFocusInWindow());
+                        "canvas.requestFocusInWindow() = " + canvas.requestFocusInWindow());
         }
         
         /**
@@ -161,9 +147,7 @@ final class Window
                 {
                         for (byte s = (byte)(die.length - 1); s >= 0; --s)
                         {
-                                die[s] =
-                                        ImageIO.read(
-                                                new File("Images/Die/" + (s + 1) + ".png"));
+                                die[s] = ImageIO.read(new File("Images/Die/" + (s + 1) + ".png"));
                         }
                         
                         General.setPrivateStaticFinal(
@@ -176,10 +160,9 @@ final class Window
                                 Window.class, "GPS_SCREEN_Y",
                                 (short)(CENTER_Y - gpsScreen.getHeight() / 2));
                         General.setPrivateStaticFinal(
-                                Window.class, "map",
-                                ImageIO.read(new File("Images/Map.png")));
+                                Window.class, "map", ImageIO.read(new File("Images/Map.png")));
                 }
-                catch (IOException e)
+                catch (final IOException e)
                 {
                         System.out.println(e.getMessage());
                 }
@@ -230,26 +213,11 @@ final class Window
                 dieSide = -1;
                 
                 /*
-                 * For now this is just set to some other randome card. Eventually we want
-                 * this to simulate a used-card stack where we're only picking random cards
-                 * from the new-card stack and used ones are disposed of. Once the used-card
-                 * stack contains all of the instruction cards available, we can shuffle the
-                 * used-card stack so that it will become the new-card stack
+                 * Since the deck is always reshuffled after all the cards have been used, we can
+                 * assume to set our instruction card to the next simply increasing by one
                  */
-                instructionCard = newDeck.peek();
-                oldDeck.push(newDeck.pop());
-                
-                if (newDeck.size() == 0)
-                {
-                        while (!oldDeck.empty())
-                                oldDeck.pop();
-                    
-                        for (byte i = 0; i < This.INSTRUCTION_CARDS.length; ++i)
-                                newDeck.push(i);
-                                
-                        shuffleDeck(This.INSTRUCTION_CARDS);
-                }
-               
+                instructionCard = (byte)((instructionCard + 1) % This.INSTRUCTION_CARDS.length);
+                if (instructionCard == 0) shuffleDeck(This.INSTRUCTION_CARDS);
         }
         
         /**
@@ -262,12 +230,9 @@ final class Window
                 g.drawImage(gpsScreen, GPS_SCREEN_X, GPS_SCREEN_Y, null);
                 g.setPaint(Color.WHITE);
                 
-                for (byte l = 0; l < This.INSTRUCTION_CARDS[instructionCard].length; ++l)
-                {
-                        g.drawString(
-                                This.INSTRUCTION_CARDS[instructionCard][l],
-                                GPS_SCREEN_X + 75, GPS_SCREEN_Y + 175 + l * 24);
-                }
+                paintParagraph(
+                        g, This.INSTRUCTION_CARDS[instructionCard][dieFrame],
+                        new Point(GPS_SCREEN_X + 75, GPS_SCREEN_Y + 145), (short)360);
                 
                 g.setPaint(Color.BLACK);
                 
@@ -302,13 +267,42 @@ final class Window
                 {
                         final byte nextFrame = (byte)random.nextInt(N_SIDED_DIE);
                         dieFrame =
-                                dieFrame == nextFrame
-                                ? (byte)((nextFrame + 1) % N_SIDED_DIE)
+                                dieFrame == nextFrame ? (byte)((nextFrame + 1) % N_SIDED_DIE)
                                 : nextFrame;
                         dieSpinTimer = 0;
                         
                         if (!dieThrown) return;
                         dieStopCounter += (dieStopCounter >> 2) + random.nextInt(10) + 1;
+                }
+        }
+        
+        /**
+         * Forces a string of text into a bounding paragraph.
+         *
+         * @param g      the handle to the graphical device
+         * @param text   the text for the paragraph
+         * @param p      the x and y starting location
+         * @param width  the width of the paragraph in screen coordinates
+         */
+        private static void paintParagraph(
+                        final Graphics2D g, final String text, final Point p, final short width)
+        {
+                final AttributedString as = new AttributedString(text);
+                as.addAttribute(TextAttribute.FONT, FONT);
+                
+                final LineBreakMeasurer lbm =
+                        new LineBreakMeasurer(as.getIterator(), g.getFontRenderContext());
+                short y = 0;
+                
+                while (lbm.getPosition() < text.length())
+                {
+                        final TextLayout tl = lbm.nextLayout(width);
+                        
+                        y += tl.getAscent();
+                        tl.draw(
+                                g, tl.isLeftToRight() ? p.x : p.x + width - tl.getAdvance(),
+                                p.y + y);
+                        y += tl.getDescent() + tl.getLeading();
                 }
         }
         
@@ -372,7 +366,7 @@ final class Window
          */
         private static void shuffleDeck(final String[][] deck)
         {
-                for (byte c = (byte)(deck.length - 1) ;c >= 0; --c)
+                for (byte c = (byte)(deck.length - 1); c >= 0; --c)
                 {
                         final byte randomIndex = (byte)random.nextInt(c + 1);
                         final String[] randomCard = deck[randomIndex];
