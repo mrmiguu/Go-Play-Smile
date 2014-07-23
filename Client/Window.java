@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.text.AttributedString;
 import java.text.NumberFormat;
 import java.util.Random;
+import java.util.ArrayList;
 import javax.imageio.ImageIO;
 
 final class Window
@@ -47,9 +48,11 @@ final class Window
         private static final BufferedImage map = null; // reassigned later
         private static final Random random = new Random();
         
+        
         /*
          * Mutable fields
          */
+        private static ArrayList<Point> points = new ArrayList();
         private static boolean showFpsCpsAndMouseCoordinates;
         private static byte instructionCard;
         private static byte dieSpinTimer, dieFrame, dieStopCounter;
@@ -63,7 +66,8 @@ final class Window
         static void setup()
         {
                 shuffleDeck(This.INSTRUCTION_CARDS);
-                        
+                
+                
                 canvas.setSize(WIDTH, HEIGHT);
                 frame.add(canvas);
                 frame.setResizable(false);
@@ -132,6 +136,7 @@ final class Window
                         Window.class, "bufferStrategy", canvas.getBufferStrategy());
 
                 load();
+                findLocations(map);
                 frame.setLocationRelativeTo(null);
                 frame.setVisible(true);
                 System.out.println(
@@ -375,5 +380,39 @@ final class Window
                         deck[randomIndex] = deck[c];
                         deck[c] = randomCard;
                 }
+        }
+        
+        private static void findLocations(BufferedImage image)
+        {
+            Color a = Color.RED;
+            
+            int color = a.getRGB();
+            boolean newLocation = true;
+            
+            for(int y = 0; y < map.getHeight(); ++y)
+                for(int x = 0; x < map.getWidth(); ++x)
+                {
+                    newLocation = true;
+                    
+                    if(image.getRGB(x,y) == color && points.isEmpty())
+                    {
+                       points.add(new Point(x + 1, y + 6));
+                    }
+                    
+                    else if(image.getRGB(x,y) == color && !points.isEmpty())
+                    {
+                        for(int i = 0; i < points.size(); i++)
+                        {
+                            if (Math.abs(points.get(i).getX() - x) <= 7 && Math.abs(points.get(i).getY() - y) <= 7)  
+                                newLocation = false;                            
+                        }
+                        
+                        if (newLocation)
+                            points.add(new Point(x + 1, y + 6));
+                        
+                    }
+                }
+            for(int i = 0; i < points.size(); ++i)
+            System.out.println(points.get(i).toString());
         }
 }
