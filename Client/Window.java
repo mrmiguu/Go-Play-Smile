@@ -392,7 +392,7 @@ final class Window
         { for (Point p : points)
           { if (Math.abs(p.getX() - x) <= 7 &&
                 Math.abs(p.getY() - y) <= 7) newLocation = false;
-            }
+          }
     
           if (newLocation) points.add(new Point(x + 1, y + 6));
         }
