@@ -333,9 +333,29 @@ final class Window
     else if (mouseY > HEIGHT) mapY = mapScreenHeightDiff;
     else mapY = (int)(mouseY * ((float)mapScreenHeightDiff / HEIGHT));
     
+    for (Point p : points)
+    { if (new Point(Math.abs(mouseX) + Math.abs(mapX),
+                Math.abs(mouseY) + Math.abs(mapY)).equals(p))
+      {
+         paintLocation(g);
+         System.out.println("WTF");
+      }
+    }
+    
     g.drawImage(map, mapX, mapY, null);
   }
   //````````````````````````````````````````````````````````````````````````````
+  /**
+   *  Paints locations if mouse-over.
+   *  
+   *  @param g  the handle to the graphical device
+   */
+  private static void paintLocation(final Graphics2D g)
+  { g.drawRect(getMouseX(), getMouseY(), 50, 50);
+    
+    
+  }
+  //```````````````````````````````````````````````````````````````````````````
   
   /**
    * Clears and disposes of the window's objects.
