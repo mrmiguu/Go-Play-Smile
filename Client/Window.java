@@ -383,23 +383,21 @@ final class Window
   
   private static void findLocations(final BufferedImage image)
   { final int color = Color.RED.getRGB();
-    boolean newLocation = true;
-  
-    for(int y = 0; y < map.getHeight(); ++y)
-    { for(int x = 0; x < map.getWidth(); ++x)
-      { newLocation = true;
 
-        if (image.getRGB(x, y) == color && points.isEmpty())
-        { points.add(new Point(x + 1, y + 6));
-        }
+    for (int y = 0; y < map.getHeight(); ++y)
+    { for (int x = 0; x < map.getWidth(); ++x)
+      { boolean newLocation = true;
 
-        else if (image.getRGB(x, y) == color && !points.isEmpty())
-        { for (int i = 0; i < points.size(); i++)
-          { if (Math.abs(points.get(i).getX() - x) <= 7 &&
-                Math.abs(points.get(i).getY() - y) <= 7) newLocation = false;
+        if (image.getRGB(x, y) == color && !points.isEmpty())
+        { for (Point p : points)
+          { if (Math.abs(p.getX() - x) <= 7 &&
+                Math.abs(p.getY() - y) <= 7) newLocation = false;
             }
     
           if (newLocation) points.add(new Point(x + 1, y + 6));
+        }
+        else if (image.getRGB(x, y) == color && points.isEmpty())
+        { points.add(new Point(x + 1, y + 6));
         }
       }
     }
