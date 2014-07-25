@@ -1,0 +1,3 @@
+@ECHO OFF
+java This
+PAUSE
