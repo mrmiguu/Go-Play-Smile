@@ -41,8 +41,8 @@ final class Window
   private static final Frame            frame          = new Frame(TITLE);
   private static final Canvas           canvas         = new Canvas();
   private static final BufferStrategy   bufferStrategy = null; // reassigned later
-  private static final BufferedImage    gpsScreen      = null; // reassigned later
-  private static final BufferedImage    map            = null; // reassigned later
+  private static final BufferedImage    gpsScreen      = loadBufferedImage("GPS_Screen.png");
+  private static final BufferedImage    map            = loadBufferedImage("Map.png");
   private static final BufferedImage[]  die            = new BufferedImage[N_SIDED_DIE];
   private static final Random           random         = new Random();
   private static final ArrayList<Point> points         = new ArrayList();
@@ -62,7 +62,7 @@ final class Window
   /**
    * Prepares the canvas and frame for the game's window.
    */
-  static void setup()
+  static void setup() throws IOException
   { shuffleDeck(This.INSTRUCTION_CARDS);
 
     canvas.setSize(WIDTH, HEIGHT);
@@ -71,87 +71,95 @@ final class Window
     frame.pack();
 
     frame.addWindowListener(
-      new WindowAdapter()
-      { @Override
-        public void windowClosing(final WindowEvent e)
-        { if (This.getUnloading() == true) return;
-          System.out.println("Unloading...");
-          This.setUnloading(true);
-        }
-      });
+        new WindowAdapter()
+        { @Override
+          public void windowClosing(final WindowEvent e)
+          { if (This.unloading == true) return;
+            System.out.println("Unloading...");
+            This.unloading = true;
+          }
+        });
 
     canvas.addKeyListener(
-      new KeyAdapter()
-      { @Override
-        public void keyPressed(final KeyEvent e)
-        { switch (e.getKeyCode())
-          { case KeyEvent.VK_F1:
-              showFpsCpsAndMouseCoords = !showFpsCpsAndMouseCoords;
-              break;
-            case KeyEvent.VK_SPACE:
-              if (showDieRoll) resetDieRoll();
-              showDieRoll = !showDieRoll;
-              break;
-            default: break;
+        new KeyAdapter()
+        { @Override
+          public void keyPressed(final KeyEvent e)
+          { switch (e.getKeyCode())
+            { case KeyEvent.VK_F1:
+                showFpsCpsAndMouseCoords = !showFpsCpsAndMouseCoords;
+                break;
+              case KeyEvent.VK_SPACE:
+                if (showDieRoll) resetDieRoll();
+                showDieRoll = !showDieRoll;
+                break;
+              default: break;
+            }
           }
-        }
         
-        @Override
-        public void keyReleased(final KeyEvent e)
-        { switch (e.getKeyCode())
-          { default: break;
+          @Override
+          public void keyReleased(final KeyEvent e)
+          { switch (e.getKeyCode())
+            { default: break;
+            }
           }
-        }
-      });
+        });
 
     canvas.addMouseListener(
-      new MouseAdapter()
-      { @Override
-        public void mouseClicked(final MouseEvent e)
-        { if (showDieRoll)
-          { dieThrown = true;
+        new MouseAdapter()
+        { @Override
+          public void mouseClicked(final MouseEvent e)
+          { if (showDieRoll)
+            { dieThrown = true;
+            }
           }
-        }
-      });
+        });
 
     canvas.setIgnoreRepaint(true); // do the painting ourselves
     canvas.createBufferStrategy(2); // setup double-buffering
     
-    // try re-setting our buffer strategy since we'll only ever need to once
+    // these are only ever set once (here)
     General.setPrivateStaticFinal(Window.class,
                                   "bufferStrategy",
                                   canvas.getBufferStrategy());
-
-    load();
-    findLocations(map);
-    frame.setLocationRelativeTo(null);
-    frame.setVisible(true);
-    System.out.println("canvas.requestFocusInWindow() = " +
-                       canvas.requestFocusInWindow());
-  }
-  //````````````````````````````````````````````````````````````````````````````
-  
-  /**
-   * Load in all buffered images from their respective locations.
-   */
-  private static void load() throws IOException
-  { for (int s = die.length; --s >= 0;)
-    { die[s] = ImageIO.read(new File("Images/Die/" + (s+1) + ".png"));
-    }
-      
-    General.setPrivateStaticFinal(Window.class,
-                                  "gpsScreen",
-                                  ImageIO.read(
-                                      new File("Images/GPS_Screen.png")));
     General.setPrivateStaticFinal(Window.class,
                                   "GPS_SCREEN_X",
                                   CENTER_X - gpsScreen.getWidth() / 2);
     General.setPrivateStaticFinal(Window.class,
                                   "GPS_SCREEN_Y",
                                   CENTER_Y - gpsScreen.getHeight() / 2);
-    General.setPrivateStaticFinal(Window.class,
-                                  "map",
-                                  ImageIO.read(new File("Images/Map.png")));
+
+    load();
+    findLocations(map);
+
+    frame.setLocationRelativeTo(null);
+    frame.setVisible(true);
+
+    System.out.println("canvas.requestFocusInWindow() = " +
+                       canvas.requestFocusInWindow());
+  }
+  //````````````````````````````````````````````````````````````````````````````
+  
+  /**
+   * Load in mutable buffered images and other resources.
+   */
+  private static void load() throws IOException
+  { for (int s = die.length; --s >= 0;)
+    { die[s] = ImageIO.read(new File("Images/Die/" + (s+1) + ".png"));
+    }
+  }
+  //````````````````````````````````````````````````````````````````````````````
+  
+  /**
+   * Load in a buffered images from its respective location.
+   */
+  private static BufferedImage loadBufferedImage(final String imageFile)
+  { try
+    { return ImageIO.read(new File("Images/" + imageFile));
+    }
+    catch (final IOException e)
+    { e.printStackTrace();
+      return null;
+    }
   }
   //````````````````````````````````````````````````````````````````````````````
 
@@ -181,9 +189,9 @@ final class Window
    */
   private static void paintFpsCpsAndMouseCoords(final Graphics2D g)
   { g.drawString("FPS: " +
-                 This.getFps() +
+                 This.fps +
                  " | CPS: " +
-                 NumberFormat.getIntegerInstance().format(This.getCps()),
+                 NumberFormat.getIntegerInstance().format(This.cps),
                  2,
                  21);
 
@@ -205,8 +213,9 @@ final class Window
     dieSide = -1;
     
     /*
-     * Since the deck is always reshuffled after all the cards have been used, we can
-     * assume to set our instruction card to the next simply increasing by one
+     * Since the deck is always reshuffled after all the cards have been used,
+     * we can assume to set our instruction card to the next simply increasing
+     * by one
      */
     instructionCard = (instructionCard + 1) % This.INSTRUCTION_CARDS.length;
     if (instructionCard == 0) shuffleDeck(This.INSTRUCTION_CARDS);
@@ -318,11 +327,11 @@ final class Window
     
     if (mouseX < 0) mapX = 0;
     else if (mouseX > WIDTH) mapX = mapScreenWidthDiff;
-    else mapX = mouseX * ((float)mapScreenWidthDiff / WIDTH);
+    else mapX = (int)(mouseX * ((float)mapScreenWidthDiff / WIDTH));
 
     if (mouseY < 0) mapY = 0;
     else if (mouseY > HEIGHT) mapY = mapScreenHeightDiff;
-    else mapY = mouseY * ((float)mapScreenHeightDiff / HEIGHT);
+    else mapY = (int)(mouseY * ((float)mapScreenHeightDiff / HEIGHT));
     
     g.drawImage(map, mapX, mapY, null);
   }
@@ -343,14 +352,14 @@ final class Window
   //````````````````````````````````````````````````````````````````````````````
   
   private static int getMouseX()
-  { return MouseInfo.getPointerInfo().getLocation().getX() -
-           canvas.getLocationOnScreen().getX();
+  { return (int)(MouseInfo.getPointerInfo().getLocation().getX() -
+           canvas.getLocationOnScreen().getX());
   }
   //````````````````````````````````````````````````````````````````````````````
   
   private static int getMouseY()
-  { return MouseInfo.getPointerInfo().getLocation().getY() -
-           canvas.getLocationOnScreen().getY();
+  { return (int)(MouseInfo.getPointerInfo().getLocation().getY() -
+           canvas.getLocationOnScreen().getY());
   }
   //````````````````````````````````````````````````````````````````````````````
   

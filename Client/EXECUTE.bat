@@ -1,3 +1,3 @@
 @ECHO OFF
-java This
+java -cp . This
 PAUSE
