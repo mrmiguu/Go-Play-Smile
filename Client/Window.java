@@ -33,6 +33,10 @@ final class Window
   private static final int     HEIGHT       = 768;
   private static final int     CENTER_X     = WIDTH >> 1;
   private static final int     CENTER_Y     = HEIGHT >> 1;
+  private static final int     DOT_WIDTH    = 13;
+  private static final int     DOT_HEIGHT   = 13;
+  private static final int     DOT_CENTER_X = DOT_WIDTH >> 1;
+  private static final int     DOT_CENTER_Y = DOT_HEIGHT >> 1;
   private static final Integer GPS_SCREEN_X = null; // reassigned later
   private static final Integer GPS_SCREEN_Y = null; // reassigned later
   private static final Font    FONT         = new Font("SansSerif", Font.PLAIN, 24);
@@ -339,8 +343,8 @@ final class Window
         = new Point(mouseX + Math.abs(mapX), mouseY + Math.abs(mapY));
 
     for (Point p : points)
-    { if (mouseMapVectorSum.getX() >= p.getX() - 6 && mouseMapVectorSum.getX() <= p.getX() + 6 &&
-          mouseMapVectorSum.getY() >= p.getY() - 6 && mouseMapVectorSum.getY() <= p.getY() + 6)
+    { if (mouseMapVectorSum.getX() >= p.getX() - DOT_CENTER_X && mouseMapVectorSum.getX() <= p.getX() + DOT_CENTER_X &&
+          mouseMapVectorSum.getY() >= p.getY() - DOT_CENTER_Y && mouseMapVectorSum.getY() <= p.getY() + DOT_CENTER_Y)
       { paintLocation(g);
       }
     }
@@ -412,14 +416,14 @@ final class Window
 
         if (image.getRGB(x, y) == color && !points.isEmpty())
         { for (Point p : points)
-          { if (Math.abs(p.getX() - x) <= 7 &&
-                Math.abs(p.getY() - y) <= 7) newLocation = false;
+          { if (Math.abs(p.getX() - x) <= DOT_CENTER_X &&
+                Math.abs(p.getY() - y) <= DOT_CENTER_Y) newLocation = false;
           }
     
-          if (newLocation) points.add(new Point(x + 1, y + 6));
+          if (newLocation) points.add(new Point(x + 1, y + DOT_CENTER_Y));
         }
         else if (image.getRGB(x, y) == color && points.isEmpty())
-        { points.add(new Point(x + 1, y + 6));
+        { points.add(new Point(x + 1, y + DOT_CENTER_Y));
         }
       }
     }
