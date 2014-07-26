@@ -332,19 +332,21 @@ final class Window
     if (mouseY < 0) mapY = 0;
     else if (mouseY > HEIGHT) mapY = mapScreenHeightDiff;
     else mapY = (int)(mouseY * ((float)mapScreenHeightDiff / HEIGHT));
-    
+
+    g.drawImage(map, mapX, mapY, null);
+
+    final Point mouseMapVectorSum
+        = new Point(mouseX + Math.abs(mapX), mouseY + Math.abs(mapY));
+
     for (Point p : points)
-    { if (new Point(Math.abs(mouseX) + Math.abs(mapX),
-                Math.abs(mouseY) + Math.abs(mapY)).equals(p))
-      {
-         paintLocation(g);
-         System.out.println("WTF");
+    { if (mouseMapVectorSum.getX() >= p.getX() - 6 && mouseMapVectorSum.getX() <= p.getX() + 6 &&
+          mouseMapVectorSum.getY() >= p.getY() - 6 && mouseMapVectorSum.getY() <= p.getY() + 6)
+      { paintLocation(g);
       }
     }
-    
-    g.drawImage(map, mapX, mapY, null);
   }
   //````````````````````````````````````````````````````````````````````````````
+
   /**
    *  Paints locations if mouse-over.
    *  
