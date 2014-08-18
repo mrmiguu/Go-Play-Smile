@@ -23,11 +23,10 @@ final class General
     { final Field f = c.getDeclaredField(field);
       f.setAccessible(true);
 
-      final Field modifiersField =
-        Field.class.getDeclaredField("modifiers");
+      final Field
+        modifiersField = Field.class.getDeclaredField("modifiers");
       modifiersField.setAccessible(true);
-      modifiersField.setInt(
-        f, f.getModifiers() & ~Modifier.FINAL);
+      modifiersField.setInt(f, f.getModifiers() & ~Modifier.FINAL);
 
       f.set(null, value);
     }

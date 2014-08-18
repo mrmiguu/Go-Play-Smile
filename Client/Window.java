@@ -27,40 +27,53 @@ import javax.imageio.ImageIO;
 
 final class Window
 { /* Constants ************************/
-  private static final byte    N_SIDED_DIE  = 6;
-  private static final String  TITLE        = "Go-Play-Smile!";
-  private static final int     WIDTH        = 1024;
-  private static final int     HEIGHT       = 768;
-  private static final int     CENTER_X     = WIDTH >> 1;
-  private static final int     CENTER_Y     = HEIGHT >> 1;
-  private static final int     DOT_WIDTH    = 13;
-  private static final int     DOT_HEIGHT   = 13;
-  private static final int     DOT_CENTER_X = DOT_WIDTH >> 1;
-  private static final int     DOT_CENTER_Y = DOT_HEIGHT >> 1;
-  private static final Integer GPS_SCREEN_X = null; // reassigned later
-  private static final Integer GPS_SCREEN_Y = null; // reassigned later
-  private static final Font    FONT         = new Font("SansSerif", Font.PLAIN, 24);
+  private static final String
+    TITLE = "Go-Play-Smile!";
+  private static final int
+    WIDTH = 1024,
+    HEIGHT = 768,
+    CENTER_X = WIDTH >> 1,
+    CENTER_Y = HEIGHT >> 1,
+    DOT_WIDTH = 13,
+    DOT_HEIGHT = 13,
+    DOT_CENTER_X = DOT_WIDTH >> 1,
+    DOT_CENTER_Y = DOT_HEIGHT >> 1,
+    N_SIDED_DIE = 6;
+  private static final Integer
+    GPS_SCREEN_X = null, // reassigned later
+    GPS_SCREEN_Y = null; // reassigned later
+  private static final Font
+    FONT = new Font("SansSerif", Font.PLAIN, 24);
 
   /* Immutable fields *****************/
-  private static final Frame            frame          = new Frame(TITLE);
-  private static final Canvas           canvas         = new Canvas();
-  private static final BufferStrategy   bufferStrategy = null; // reassigned later
-  private static final BufferedImage    gpsScreen      = loadBufferedImage("GPS_Screen.png");
-  private static final BufferedImage    map            = loadBufferedImage("Map.png");
-  private static final BufferedImage[]  die            = new BufferedImage[N_SIDED_DIE];
-  private static final Random           random         = new Random();
-  private static final ArrayList<Point> points         = new ArrayList();
+  private static final Frame
+    frame = new Frame(TITLE);
+  private static final Canvas
+    canvas = new Canvas();
+  private static final BufferStrategy
+    bufferStrategy = null; // reassigned later
+  private static final BufferedImage
+    gpsScreen = loadBufferedImage("GPS_Screen.png"),
+    map = loadBufferedImage("Map.png");
+  private static final BufferedImage[]
+    die = new BufferedImage[N_SIDED_DIE];
+  private static final Random
+    random = new Random();
+  private static final ArrayList<Point>
+    points = new ArrayList();
 
   /* Mutable fields *******************/
-  private static boolean showFpsCpsAndMouseCoords;
-  private static int     instructionCard;
-  private static int     dieSpinTimer;
-  private static int     dieFrame;
-  private static int     dieStopCounter;
-  private static boolean showDieRoll;
-  private static boolean dieThrown;
-  private static int     dieSide = -1;
-  private static boolean showMap = true;
+  private static boolean
+    showFpsCpsAndMouseCoords,
+    dieThrown,
+    showDieRoll,
+    showMap = true;
+  private static int
+    instructionCard,
+    dieSpinTimer,
+    dieFrame,
+    dieStopCounter,
+    dieSide = -1;
   //````````````````````````````````````````````````````````````````````````````
 
   /**
@@ -74,53 +87,50 @@ final class Window
     frame.setResizable(false);
     frame.pack();
 
-    frame.addWindowListener(
-        new WindowAdapter()
-        { @Override
-          public void windowClosing(final WindowEvent e)
-          { if (This.unloading == true) return;
-            System.out.println("Unloading...");
-            This.unloading = true;
-          }
-        });
+    frame.addWindowListener(new WindowAdapter()
+    { @Override
+      public void windowClosing(final WindowEvent e)
+      { if (This.unloading == true) return;
+        System.out.println("Unloading...");
+        This.unloading = true;
+      }
+    });
 
-    canvas.addKeyListener(
-        new KeyAdapter()
-        { @Override
-          public void keyPressed(final KeyEvent e)
-          { switch (e.getKeyCode())
-            { case KeyEvent.VK_F1:
-                showFpsCpsAndMouseCoords = !showFpsCpsAndMouseCoords;
-                break;
-              case KeyEvent.VK_SPACE:
-                if (showDieRoll) resetDieRoll();
-                showDieRoll = !showDieRoll;
-                break;
-              default: break;
-            }
-          }
-        
-          @Override
-          public void keyReleased(final KeyEvent e)
-          { switch (e.getKeyCode())
-            { default: break;
-            }
-          }
-        });
+    canvas.addKeyListener(new KeyAdapter()
+    { @Override
+      public void keyPressed(final KeyEvent e)
+      { switch (e.getKeyCode())
+        { case KeyEvent.VK_F1:
+            showFpsCpsAndMouseCoords = !showFpsCpsAndMouseCoords;
+            break;
+          case KeyEvent.VK_SPACE:
+            if (showDieRoll) resetDieRoll();
+            showDieRoll = !showDieRoll;
+            break;
+          default: break;
+        }
+      }
 
-    canvas.addMouseListener(
-        new MouseAdapter()
-        { @Override
-          public void mouseClicked(final MouseEvent e)
-          { if (showDieRoll)
-            { dieThrown = true;
-            }
-          }
-        });
+      @Override
+      public void keyReleased(final KeyEvent e)
+      { switch (e.getKeyCode())
+        { default: break;
+        }
+      }
+    });
+
+    canvas.addMouseListener(new MouseAdapter()
+    { @Override
+      public void mouseClicked(final MouseEvent e)
+      { if (showDieRoll)
+        { dieThrown = true;
+        }
+      }
+    });
 
     canvas.setIgnoreRepaint(true); // do the painting ourselves
     canvas.createBufferStrategy(2); // setup double-buffering
-    
+
     // these are only ever set once (here)
     General.setPrivateStaticFinal(Window.class,
                                   "bufferStrategy",
@@ -142,7 +152,7 @@ final class Window
                        canvas.requestFocusInWindow());
   }
   //````````````````````````````````````````````````````````````````````````````
-  
+
   /**
    * Load in mutable buffered images and other resources.
    */
@@ -152,7 +162,7 @@ final class Window
     }
   }
   //````````````````````````````````````````````````````````````````````````````
-  
+
   /**
    * Load in a buffered images from its respective location.
    */
@@ -171,7 +181,8 @@ final class Window
    * Draws the visuals of the game onto the window's canvas.
    */
   static void paint()
-  { final Graphics2D g = (Graphics2D)bufferStrategy.getDrawGraphics();
+  { final Graphics2D
+      g = (Graphics2D)bufferStrategy.getDrawGraphics();
     g.clearRect(0, 0, WIDTH, HEIGHT);
     g.setFont(FONT);
     g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
@@ -180,15 +191,16 @@ final class Window
     if (showMap) paintMap(g);
     if (showFpsCpsAndMouseCoords) paintFpsCpsAndMouseCoords(g);
     if (showDieRoll) paintDieRoll(g);
+    // if (showCar) paintCar(g);
 
     g.dispose();
     bufferStrategy.show();
   }
   //````````````````````````````````````````````````````````````````````````````
-  
+
   /**
    * Displays the FPS, CPS, and mouse coordinates onto the screen.
-   * 
+   *
    * @param g  the handle to the graphical device
    */
   private static void paintFpsCpsAndMouseCoords(final Graphics2D g)
@@ -207,7 +219,7 @@ final class Window
                  45);
   }
   //````````````````````````````````````````````````````````````````````````````
-  
+
   /**
    * Allows for a rethrow of the die.
    */
@@ -215,7 +227,7 @@ final class Window
   { dieStopCounter = dieFrame = dieSpinTimer = 0;
     dieThrown = false;
     dieSide = -1;
-    
+
     /*
      * Since the deck is always reshuffled after all the cards have been used,
      * we can assume to set our instruction card to the next simply increasing
@@ -225,30 +237,33 @@ final class Window
     if (instructionCard == 0) shuffleDeck(This.INSTRUCTION_CARDS);
   }
   //````````````````````````````````````````````````````````````````````````````
-  
+
   /**
    * Displays the entire die rolling scene.
-   * 
+   *
    * @param g  the handle to the graphical device
    */
   private static void paintDieRoll(final Graphics2D g)
   { g.drawImage(gpsScreen, GPS_SCREEN_X, GPS_SCREEN_Y, null);
     g.setPaint(Color.WHITE);
-    
+
     paintParagraph(g,
                    This.INSTRUCTION_CARDS[instructionCard][dieFrame],
                    new Point(GPS_SCREEN_X + 75, GPS_SCREEN_Y + 145),
                    360);
-    
+
     g.setPaint(Color.BLACK);
-    final int dieX, dieY;
-    
+
+    final int
+      dieX,
+      dieY;
+
     if (!dieThrown)
     { dieX = getMouseX() - die[dieFrame].getWidth() / 2;
       dieY = getMouseY() - die[dieFrame].getHeight() / 2;
     }
     else dieY = dieX = 0;
-    
+
     g.drawImage(die[dieFrame], dieX, dieY, null);
 
     /*
@@ -262,24 +277,26 @@ final class Window
 
       return;
     }
-    
+
     /*
      * Animate the spinning die once every 6 frames (minimum)
      */
     if (++dieSpinTimer >= 6 + (dieThrown ? dieStopCounter : 0))
-    { final int nextFrame = random.nextInt(N_SIDED_DIE);
-      dieFrame =
-          dieFrame == nextFrame
-              ? (nextFrame + 1) % N_SIDED_DIE
-              : nextFrame;
-          dieSpinTimer = 0;
-      
+    { final int
+        nextFrame = random.nextInt(N_SIDED_DIE);
+
+      dieFrame = (dieFrame == nextFrame
+        ? (nextFrame + 1) % N_SIDED_DIE
+        : nextFrame);
+
+      dieSpinTimer = 0;
+
       if (!dieThrown) return;
       dieStopCounter += (dieStopCounter >> 2) + random.nextInt(10) + 1;
     }
   }
   //````````````````````````````````````````````````````````````````````````````
-  
+
   /**
    * Forces a string of text into a bounding paragraph.
    *
@@ -292,43 +309,47 @@ final class Window
                                      final String text,
                                      final Point p,
                                      final int width)
-  { final AttributedString as = new AttributedString(text);
+  { final AttributedString
+      as = new AttributedString(text);
     as.addAttribute(TextAttribute.FONT, FONT);
-    
-    final LineBreakMeasurer lbm
-        = new LineBreakMeasurer(as.getIterator(), g.getFontRenderContext());
+
+    final LineBreakMeasurer
+      lbm = new LineBreakMeasurer(as.getIterator(), g.getFontRenderContext());
 
     int y = 0;
-    
+
     while (lbm.getPosition() < text.length())
-    { final TextLayout tl = lbm.nextLayout(width);
+    { final TextLayout
+        tl = lbm.nextLayout(width);
       y += tl.getAscent();
 
-      tl.draw(g,
-              tl.isLeftToRight()
-                  ? p.x
-                  : p.x + width - tl.getAdvance(),
-              p.y + y);
+      tl.draw(
+        g,
+        tl.isLeftToRight()
+          ? p.x
+          : p.x + width - tl.getAdvance(),
+        p.y + y);
 
       y += tl.getDescent() + tl.getLeading();
     }
   }
   //````````````````````````````````````````````````````````````````````````````
-  
+
   /**
    * Displays the entire map screen.
-   * 
+   *
    * @param g  the handle to the graphical device
    */
   private static void paintMap(final Graphics2D g)
-  { final int mouseX = getMouseX(), mouseY = getMouseY();
+  { final int
+      mouseX = getMouseX(),
+      mouseY = getMouseY(),
+      // with a huge map the difference could pass 32k
+      mapScreenWidthDiff = WIDTH - map.getWidth(),
+      mapScreenHeightDiff = HEIGHT - map.getHeight(),
+      mapX,
+      mapY;
 
-    // with a huge map the difference could pass 32k
-    final int mapScreenWidthDiff = WIDTH - map.getWidth(),
-              mapScreenHeightDiff = HEIGHT - map.getHeight();
-
-    final int mapX, mapY;
-    
     if (mouseX < 0) mapX = 0;
     else if (mouseX > WIDTH) mapX = mapScreenWidthDiff;
     else mapX = (int)(mouseX * ((float)mapScreenWidthDiff / WIDTH));
@@ -339,12 +360,16 @@ final class Window
 
     g.drawImage(map, mapX, mapY, null);
 
-    final Point mouseMapVectorSum
-        = new Point(mouseX + Math.abs(mapX), mouseY + Math.abs(mapY));
+    final Point
+      mouseMapVectorSum = new Point(
+        mouseX + Math.abs(mapX),
+        mouseY + Math.abs(mapY));
 
     for (Point p : points)
-    { if (mouseMapVectorSum.getX() >= p.getX() - DOT_CENTER_X && mouseMapVectorSum.getX() <= p.getX() + DOT_CENTER_X &&
-          mouseMapVectorSum.getY() >= p.getY() - DOT_CENTER_Y && mouseMapVectorSum.getY() <= p.getY() + DOT_CENTER_Y)
+    { if (mouseMapVectorSum.getX() >= p.getX() - DOT_CENTER_X &&
+          mouseMapVectorSum.getX() <= p.getX() + DOT_CENTER_X &&
+          mouseMapVectorSum.getY() >= p.getY() - DOT_CENTER_Y &&
+          mouseMapVectorSum.getY() <= p.getY() + DOT_CENTER_Y)
       { paintLocation(g);
       }
     }
@@ -353,60 +378,46 @@ final class Window
 
   /**
    *  Paints locations if mouse-over.
-   *  
+   *
    *  @param g  the handle to the graphical device
    */
   private static void paintLocation(final Graphics2D g)
   { g.drawRect(getMouseX(), getMouseY(), 50, 50);
-    
-    
-  }
-  //```````````````````````````````````````````````````````````````````````````
-  
-  /**
-   * Clears and disposes of the window's objects.
-   */
-  static void unload()
-  { for (int s = 0; s < die.length; s++)
-    { die[s].flush();
-      die[s] = null;
-    }
-    
-    bufferStrategy.dispose();
-    frame.dispose();
+
+
   }
   //````````````````````````````````````````````````````````````````````````````
-  
+
   private static int getMouseX()
   { return (int)(MouseInfo.getPointerInfo().getLocation().getX() -
-           canvas.getLocationOnScreen().getX());
+                 canvas.getLocationOnScreen().getX());
   }
   //````````````````````````````````````````````````````````````````````````````
-  
+
   private static int getMouseY()
   { return (int)(MouseInfo.getPointerInfo().getLocation().getY() -
-           canvas.getLocationOnScreen().getY());
+                 canvas.getLocationOnScreen().getY());
   }
   //````````````````````````````````````````````````````````````````````````````
-  
+
   /**
    * Goes through a deck of cards sequentially and swaps with another card at a
    * random position somewhere inside of the deck.
-   * 
+   *
    * @param deck  the deck of 6-lined cards
    */
   private static void shuffleDeck(final String[][] deck)
   { for (int c = deck.length; --c >= 0;)
     { final int randomIndex = random.nextInt(c + 1);
       final String[] randomCard = deck[randomIndex];
-      
+
       // swap
       deck[randomIndex] = deck[c];
       deck[c] = randomCard;
     }
   }
   //``````````````````````````````````````````````````````````````````````````````
-  
+
   private static void findLocations(final BufferedImage image)
   { final int color = Color.RED.getRGB();
 
@@ -419,7 +430,7 @@ final class Window
           { if (Math.abs(p.getX() - x) <= DOT_CENTER_X &&
                 Math.abs(p.getY() - y) <= DOT_CENTER_Y) newLocation = false;
           }
-    
+
           if (newLocation) points.add(new Point(x + 1, y + DOT_CENTER_Y));
         }
         else if (image.getRGB(x, y) == color && points.isEmpty())
@@ -431,5 +442,21 @@ final class Window
     for (int i = 0; i < points.size(); ++i)
     { System.out.println(points.get(i).toString());
     }
+  }
+  //```````````````````````````````````````````````````````````````````````````
+
+  /**
+   * Clears and disposes of the window's objects.
+   */
+  static void unload()
+  { for (int s = 0; s < die.length; s++)
+    { die[s].flush();
+      die[s] = null;
+    }
+    map.flush();
+    gpsScreen.flush();
+
+    bufferStrategy.dispose();
+    frame.dispose();
   }
 }
