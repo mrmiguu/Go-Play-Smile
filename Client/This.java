@@ -354,8 +354,7 @@ final class This
       cycleCount = 0;
 
     while (true)
-    {
-      final long
+    { final long
         NOW = System.currentTimeMillis(); // log our current time for speed
 
       /*
