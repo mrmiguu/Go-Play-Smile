@@ -1,5 +1,5 @@
-final class This
-{ /* Constants ************************/
+final class This {
+  /* Constants ************************/
   static final String[][]
     INSTRUCTION_CARDS
       = { { "Traffic jam on 405 by Airport. All cars on 405 lose one turn. If" +
@@ -332,8 +332,10 @@ final class This
    *
    * @param args  an array of commands entered at execution time
    */
-  public static void main(final String[] args) throws Exception
-  { Window.setup();
+  public static void main(final String[] args)
+      throws Exception {
+
+    Window.setup();
     run();    // 2nd-to-last
     unload(); // last
   }
@@ -342,8 +344,8 @@ final class This
   /**
    * Launches the client into its real-time loop.
    */
-  private static void run()
-  { long
+  private static void run() {
+    long
       timer2500 = 0,
       timer30 = 0,
       timer15 = 0,
@@ -353,30 +355,30 @@ final class This
       frameCount = 0,
       cycleCount = 0;
 
-    while (true)
-    { final long
+    while (true) {
+      final long
         NOW = System.currentTimeMillis(); // log our current time for speed
 
       /*
        * Late events are initiated here
        */
-      if (timer2500 < NOW)
-      { if (unloading) break;
+      if (timer2500 < NOW) {
+        if (unloading) break;
         timer2500 = NOW + 2500;
       }
 
       /*
        * The physics of the game run at half the frame rate (~30 fps)
        */
-      if (timer30 < NOW)
-      { timer30 = NOW + 30;
+      if (timer30 < NOW) {
+        timer30 = NOW + 30;
       }
 
       /*
        * The frame rate is processed and counted
        */
-      if (timer15 < NOW)
-      { Window.paint();
+      if (timer15 < NOW) {
+        Window.paint();
         ++frameCount;
         timer15 = NOW + 15; // adjusts so FPS is ~60
       }
@@ -385,8 +387,8 @@ final class This
        * The last thing calculated is the amount of cycles per second
        */
       ++cycleCount;
-      if (timer1000 < NOW)
-      { fps = frameCount;
+      if (timer1000 < NOW) {
+        fps = frameCount;
         cps = cycleCount;
         cycleCount = frameCount = 0;
         timer1000 = NOW + 1000;
@@ -398,8 +400,8 @@ final class This
   /**
    * Properly unloads the client.
    */
-  private static void unload()
-  { Window.unload();
+  private static void unload() {
+    Window.unload();
     System.out.println("Unloaded!");
   }
 }
