@@ -38,7 +38,8 @@ final class Window
     DOT_HEIGHT = 13,
     DOT_CENTER_X = DOT_WIDTH >> 1,
     DOT_CENTER_Y = DOT_HEIGHT >> 1,
-    N_SIDED_DIE = 6;
+    N_SIDED_DIE = 6,
+    N_NUMBER_PICS = 57;
   private static final Integer
     GPS_SCREEN_X = null, // reassigned later
     GPS_SCREEN_Y = null; // reassigned later
@@ -57,6 +58,8 @@ final class Window
     map = loadBufferedImage("Map.png");
   private static final BufferedImage[]
     die = new BufferedImage[N_SIDED_DIE];
+  private static final ArrayList<BufferedImage>
+    locationpics = new ArrayList();
   private static final Random
     random = new Random();
   private static final ArrayList<Point>
@@ -159,6 +162,9 @@ final class Window
   private static void load() throws IOException
   { for (int s = die.length; --s >= 0;)
     { die[s] = ImageIO.read(new File("Images/Die/" + (s+1) + ".png"));
+    }
+    for (int d = 0; d < N_NUMBER_PICS; ++d)       
+    { locationpics.add(ImageIO.read(new File("Images/Locations/location" + (d+1) + ".png")));
     }
   }
   //````````````````````````````````````````````````````````````````````````````
@@ -383,9 +389,16 @@ final class Window
    */
   private static void paintLocation(final Graphics2D g, Point p)
   { 
+    int counter = 0;
     for(int i = 0; i < points.size(); ++i)
-    { if(p.equals(points.get(i)))
-        g.drawString(This.LOCATIONS[i], getMouseX(), getMouseY());
+    { if (p.equals(points.get(i)) && This.LOCATIONS[i].length() > 3)
+      { g.drawString(This.LOCATIONS[i], getMouseX(), getMouseY());
+        g.drawImage(locationpics.get(counter), getMouseX(), getMouseY(), null);
+      }
+      if (This.LOCATIONS[i].length() > 3)
+        counter++;
+      
+      
     }
 
 
