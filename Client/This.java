@@ -316,6 +316,20 @@ final class This {
             "Flat tire. Call AAA, then wait this turn for their help."
           }
         };
+        
+  static final String[] LOCATIONS 
+    = { "Santa Clarita", "San Fernando", "Lakeview Terrace", "Sunland", "Panorama City",
+        "La Cañada", "Pasadena", "Van Nuys", "Burbank", "Studio City", " I ",
+        "Glendale", "Azusa", "San Dimas", "Claremont", "Highland Park", " I ",
+        "Los Angeles", " I ", "Rosemead", "West Covina", "Pomona", "El Monte", 
+        " I ", "I", "Monterey Park", "Cal Poly", "USC", "Commerce", "South El Monte",
+        "Culver City", " I ", "Chino Hills", " I ", "Santa Monica", "Diamond Bar",
+        "Industry", "Sante Fe Springs", "LA Airport", "Watts", "Lynwood", "Brea",
+        "Corona", "Bellflower", "Compton", "Hawthorne", "Gardena", "Dominguez Hills",
+        "North Long Beach", "Torrance", "Buena Park", "Carson", "", "Fullerton",
+        "Yorba Linda", " I ", "Cyprus", "Westminster", "Palos Verdes", " I ", "Gardeon Grove",
+        "Orange", " I ", "Long Beach", "San Pedro", "Huntington Beach", "Santa Ana",
+        "Fountain Valley"};
 
   /* Immutable fields *****************/
 
@@ -323,7 +337,7 @@ final class This {
   static volatile boolean
     unloading;
   static int
-    fps;
+    fps,
     cps;
   //````````````````````````````````````````````````````````````````````````````
 

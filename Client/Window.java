@@ -370,7 +370,7 @@ final class Window
           mouseMapVectorSum.getX() <= p.getX() + DOT_CENTER_X &&
           mouseMapVectorSum.getY() >= p.getY() - DOT_CENTER_Y &&
           mouseMapVectorSum.getY() <= p.getY() + DOT_CENTER_Y)
-      { paintLocation(g);
+      { paintLocation(g, p);
       }
     }
   }
@@ -381,8 +381,12 @@ final class Window
    *
    *  @param g  the handle to the graphical device
    */
-  private static void paintLocation(final Graphics2D g)
-  { g.drawRect(getMouseX(), getMouseY(), 50, 50);
+  private static void paintLocation(final Graphics2D g, Point p)
+  { 
+    for(int i = 0; i < points.size(); ++i)
+    { if(p.equals(points.get(i)))
+        g.drawString(This.LOCATIONS[i], getMouseX(), getMouseY());
+    }
 
 
   }
